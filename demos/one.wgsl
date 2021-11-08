@@ -1,6 +1,6 @@
 let size = 3.0;
 
-    let b = 0.3;		//size of the smoothed border
+    let b = .3;		//size of the smoothed border
 
     fn mainImage(fragCoord: vec2<f32>, iResolution: vec2<f32>) -> vec4<f32> {
       let aspect = iResolution.x/iResolution.y;
@@ -35,7 +35,7 @@ let size = 3.0;
 
     //if (fragCoord.x > .5) {color = 1.; }
     return vec4<f32>(
-      distToMouseX, 
+      1. -distToMouseX, 
       distToMouseY  , 
       color, 
       1.

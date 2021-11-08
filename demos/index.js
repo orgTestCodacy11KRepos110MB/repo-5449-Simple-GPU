@@ -2,11 +2,16 @@ import shapeTransition from "./webgl/shape-transition";
 import breath from "./webgl/breath";
 import { start_loop_static, start_loop_nb } from "../src/main";
 import ringShader from './one.wgsl?raw';
-import stripesShader from './one.wgsl?raw';
-import chessboardShader from './one.wgsl?raw';
+import stripesShader from './two.wgsl?raw';
+import chessboardShader from './four.wgsl?raw';
+import lightShader from './light.wgsl?raw';
+
+light()
+
+
 //todo add video and more 
 let demos = {
-  shapeTransition, breath, stripes, rings, chessboard
+  shapeTransition, breath, stripes, rings, chessboard, light
 }
 
 function stripes()  {
@@ -47,6 +52,13 @@ function video() {
     data: ['video-tag']
   })
 }
+
+function light () {
+  customShader({
+    shader: lightShader,
+  });
+}
+
 
 //todo make this swap between demos in a elegant but not too abstract way. 
 //or just glue it together

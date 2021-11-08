@@ -6,7 +6,7 @@ let size = 3.0;
       let aspect = iResolution.x/iResolution.y;
       let position = (fragCoord.xy/iResolution.xy) * aspect;
       let dist = distance(position, vec2<f32>(aspect*0.5, 0.5));
-      let offset=u.time;
+      let offset=u.time * 0.0000001;
       let conv=4.;
       let v=dist*4.-offset;
       let ringr=floor(v);
@@ -26,7 +26,7 @@ let size = 3.0;
     let fragCoord = vec2<f32>(uv.x, uv.y);
     var base = vec4<f32>(cos(u.time), .5, sin(u.time), 1.);
     let dist = distance( fragCoord, vec2<f32>(u.mouseX,  u.mouseY));
-    return vec4<f32>(.3, .3, sin(u.time * .001), 1.) + mainImage(fragCoord, vec2<f32>(u.width, u.height));
+    return vec4<f32>(.3, .3, sin(u.time * .00000001), 1.);
   }
 
   [[stage(fragment)]]
