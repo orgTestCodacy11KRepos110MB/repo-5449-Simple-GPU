@@ -3,7 +3,7 @@ fn drawLight( uv: vec2<f32> ) -> vec4<f32> {
     let fragCoord = vec2<f32>(uv.x, uv.y);
     var base = vec4<f32>(cos(u.time), .5, sin(u.time), 1.);
     let dist = distance( fragCoord, vec2<f32>(u.mouseX,  u.mouseY));
-    var color = vec4<f32>(.3, .3, sin(u.time * .00000001), 1.);
+    var color = vec4<f32>(.5, .3, sin(u.time * .0000001), 1.);
 	var l = time;
     var z = time;
     var r = vec2<f32>(u.width, u.height);
