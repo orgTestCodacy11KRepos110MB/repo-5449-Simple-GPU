@@ -8,7 +8,7 @@ fn drawLight( uv: vec2<f32> ) -> vec4<f32> {
     var z = time;
     var r = vec2<f32>(u.width, u.height);
 	for(var i=0;i<3;i =i + 1) {
-		var p=fragCoord.xy/r;
+		var p=fragCoord.xy;
         var texCoord = p;
 	
 		p = p - .5;
@@ -16,8 +16,9 @@ fn drawLight( uv: vec2<f32> ) -> vec4<f32> {
 		z= z + .07;
 		l=length(p);
 		texCoord =texCoord + p/l*(sin(z)+1.)*abs(sin(l*9.-z-z));
-		color[i] = .01/length(texCoord) - 0.5;
-        //		color[i] = .01/length(modf(texCoord,1.) - 0.5);
+        var modded = vec2<f32>(texCoord.x % 1., texCoord.y % 1.);
+		color[i] = .01/length(modded) - 0.5;
+        //color[i] = .01/length(mod(texCoord,1.) - 0.5);
 
 	}
 	// fragColor=vec4(c/l,t);
