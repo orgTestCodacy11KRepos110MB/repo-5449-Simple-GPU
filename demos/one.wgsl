@@ -26,12 +26,12 @@ let size = 3.0;
     let distToMouseX = distance(u.mouseX, fragCoord.x);
     let distToMouseY = distance(u.mouseY, fragCoord.y);
 
-    if ( 
-     distance(u.mouseX, fragCoord.x) > .1 || 
-     distance(u.mouseY, fragCoord.y) > 2.
-      ) {
-        return vec4<f32>(.5);
-      }
+    // if ( 
+    //  distance(u.mouseX, fragCoord.x) > .1 || 
+    //  distance(u.mouseY, fragCoord.y) > 2.
+    //   ) {
+    //     return vec4<f32>(.5);
+    //   }
 
     //if (fragCoord.x > .5) {color = 1.; }
     return vec4<f32>(
