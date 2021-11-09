@@ -186,10 +186,16 @@ function redraw() {
 
 function start() {
   console.log("hi");
-  constructUi(shaderConfig, 0, 1, 0.01, false);
-  constructUi(attrConfig, 1, 20, 1, true);
+  //constructUi(shaderConfig, 0, 1, 0.01, false);
+  //constructUi(attrConfig, 1, 20, 1, true);
 
   createBothShapes();
   regl.frame(redraw);
 }
+
+//just export a draw function from each demo 
+//index imports src/main for webgpu/reading values between canvases 
+//
+//compatible with regl context and threejs canvas 
+
 export default start;

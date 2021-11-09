@@ -1,6 +1,6 @@
 import shapeTransition from "./webgl/shape-transition";
 import breath from "./webgl/breath";
-import { start_loop_static, start_loop_nb } from "../src/main";
+import { start_loop_static, start_loop_nb } from "~/src/main";
 import ringShader from './one.wgsl?raw';
 import stripesShader from './two.wgsl?raw';
 import chessboardShader from './four.wgsl?raw';
@@ -38,8 +38,10 @@ let template = document.querySelector('template').innerHTML
 let controlpanel  =  document.querySelector('#control-panel');
 
 controlpanel.innerHTML += Object.keys(demos).map(
-  title => template.replace(/{replace_me}/g, title))
+  title => template.replace(/{demo_title}/g, title))
   .join('\n')
+
+
 
 
 function customShader(options) {
@@ -64,7 +66,7 @@ function light () {
 //or just glue it together
 
 
-document.querySelectorAll("input").forEach((e) => {
+document.querySelectorAll("button").forEach((e) => {
   e.addEventListener("click", (e) => {
     console.log('name', e.target.name);
     e.target.classList.toggle("dot");

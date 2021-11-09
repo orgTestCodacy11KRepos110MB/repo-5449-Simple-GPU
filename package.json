@@ -1,19 +1,29 @@
 {
   "name": "simple-data-texture",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview"
   },
+  "files": ["dist"],
+  "main": "./dist/my-lib.umd.js",
+  "module": "./dist/my-lib.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/my-lib.es.js",
+      "require": "./dist/my-lib.umd.js"
+    }
+  },
   "devDependencies": {
     "d3": "^7.1.1",
-    "regl": "^2.1.0",
-    "vite": "^2.6.4",
-    "h3": "^0.3.3",
-    "resl": "^1.0.3",
     "gl-mat4": "^1.2.0",
-    "gl-matrix": "^3.4.3"
+    "gl-matrix": "^3.4.3",
+    "h3": "^0.3.3",
+    "path": "^0.12.7",
+    "regl": "^2.1.0",
+    "resl": "^1.0.3",
+    "vite": "^2.6.4"
   },
   "dependencies": {
     "typescript": "^4.3.2"

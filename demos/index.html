@@ -61,7 +61,11 @@
         z-index: 124;
         position: absolute;
         border: 1px dotted aliceblue;
+        width: 100%;
+        top: 0px;
       }
+
+
 
       .three.dot {
         border: 1px dotted blue;
@@ -80,28 +84,23 @@
       }
       
     </style>
-    <script defer type="module" src="/src/index.ts"></script>
-    <script defer type="module" src="/demos/index.js"></script>
+    <!-- <script defer type="module" src="../src/index.ts"></script> -->
+    <!-- <script defer type="module" src="./index.js"></script> -->
     <!-- <script type="module" src="/src/main.ts"></script> -->
   </head>
   <body>
 
     <template>
-      <label class="inline-flex items-center">
-        <input
-          type="checkbox"
-          class="form-radio"
-          name={replace_me}
-          value="personal"
-        />
-        <span class="ml-2">{replace_me}</span>
-      </label>
+      
+      <button
+       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      name={demo_title}
+      >{demo_title}</button>
     </template>
-    <div id="swap" class="mt-4">
+    <div id="swap" class="mt-4 w-screen">
       <!-- <span class="text-gray-700">Account Type</span> -->
-      <div id="control-panel" class="mt-2">
+      <div id="control-panel" class="mt-2 p-1">
          
-        
       </div>
     </div>
 

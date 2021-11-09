@@ -61,7 +61,11 @@
         z-index: 124;
         position: absolute;
         border: 1px dotted aliceblue;
+        width: 100%;
+        top: 0px;
       }
+
+
 
       .three.dot {
         border: 1px dotted blue;
@@ -69,44 +73,36 @@
         height: 500px;
         opacity: 1;
       }
+
+
+
+      #control-panel {
+        background: teal;
+        position: absolute;
+        top: 0px;
+        color: lightgray;
+      }
+      
     </style>
     
     
     <!-- <script type="module" src="/src/main.ts"></script> -->
-    <script type="module" crossorigin src="/assets/index.b74e05a6.js"></script>
+    <script type="module" crossorigin src="/assets/index.4cec7bd8.js"></script>
     <link rel="modulepreload" href="/assets/vendor.6dc65a70.js">
   </head>
   <body>
-    <div id="swap" class="mt-4">
+
+    <template>
+      
+      <button
+       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      name={demo_title}
+      >{demo_title}</button>
+    </template>
+    <div id="swap" class="mt-4 w-screen">
       <!-- <span class="text-gray-700">Account Type</span> -->
-      <div id="control-panel" class="mt-2 hidden">
-        <label class="inline-flex items-center">
-          <input
-            type="checkbox"
-            class="form-radio"
-            name="breath"
-            value="personal"
-          />
-          <span class="ml-2">breath</span>
-        </label>
-        <label class="inline-flex items-center ml-6">
-          <input
-            type="checkbox"
-            class="form-radio"
-            name="shape-transition"
-            value="busines"
-          />
-          <span class="ml-2">shape-transition</span>
-        </label>
-        <label class="inline-flex items-center ml-6">
-          <input
-            type="checkbox"
-            class="form-radio"
-            name="webgpu-video"
-            value="busines"
-          />
-          <span class="ml-2">webgpu-video</span>
-        </label>
+      <div id="control-panel" class="mt-2 p-1">
+         
       </div>
     </div>
 

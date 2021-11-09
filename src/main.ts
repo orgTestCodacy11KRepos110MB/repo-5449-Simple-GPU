@@ -109,13 +109,18 @@ async function start_loop_static(options) {
   let state = await init.init(stuff);
   requestAnimationFrame(function test() {
     data.time = performance.now();
-    //console.log('test')
-    //console.log('oo')
     state.updateUniforms(data);
     let next_state = state.draw(state);
-
     requestAnimationFrame(test)
   });
+
+  //cancelanimationframe
+  //dispose canvas
+  //start new one 
+  //support both static + nb
+  //multiple canvases with either 3js or regl or anything
+  //10 lines of stuff that works here first 
+  //then add nb tomorrow 
   let scaleX = scaleLinear().domain([0, 1]).range([0, 0.3]);
 
   let scaleY = scaleLinear().domain([1, 0]).range([0, 1]);
@@ -127,7 +132,6 @@ async function start_loop_static(options) {
     //console.log(data.mouseX, data.mouseY);
     state.updateUniforms(data);
   });
-
   //return next_state;
   // requestAnimationFrame(async function () {
   //   let canvas = start_loop().then((stuff) => {
