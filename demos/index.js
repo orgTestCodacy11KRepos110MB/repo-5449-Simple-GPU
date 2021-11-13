@@ -7,8 +7,7 @@ import chessboardShader from './four.wgsl?raw';
 import lightShader from './light.wgsl?raw';
 
 light()
-
-
+console.log('anni')
 //todo add video and more 
 let demos = {
   shapeTransition, breath, stripes, rings, chessboard, light
@@ -41,9 +40,6 @@ controlpanel.innerHTML += Object.keys(demos).map(
   title => template.replace(/{demo_title}/g, title))
   .join('\n')
 
-
-
-
 function customShader(options) {
   let start = window.location.host === "localhost:3000" ? start_loop_static : start_loop_nb;
   start(options);
@@ -60,12 +56,8 @@ function light () {
     shader: lightShader,
   });
 }
-
-
 //todo make this swap between demos in a elegant but not too abstract way. 
 //or just glue it together
-
-
 document.querySelectorAll("button").forEach((e) => {
   e.addEventListener("click", (e) => {
     console.log('name', e.target.name);
@@ -73,10 +65,6 @@ document.querySelectorAll("button").forEach((e) => {
     demos[e.target.name]()
   });
 });
-
-
-
-
 
 //checkbox to hide and show layer
 //checkbox = hide / show
