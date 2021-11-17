@@ -184,7 +184,7 @@ const createBuffer = (gpuDevice, arr, usage) => {
     usage,
     mappedAtCreation: true,
   };
-  console.log('createBuffer')
+  //console.log('createBuffer')
   let buffer = gpuDevice.createBuffer(desc);
   const writeArray =
     arr instanceof Uint16Array

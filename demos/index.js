@@ -11,33 +11,52 @@ let demos = {
 
 function stripes()  {
   video({
+    canvas: document.querySelector('.webgpu'),
     shader: stripesShader,
   });
 }
-
+//no require ux
 function rings() {
-  console.log('asdfasfd')
+  
   customShader({
+    canvas: document.querySelector('.webgpu'),
     shader: ringShader,
   });
 }
-// rings()
+
+setTimeout(function() {
+  let choices = [shapeTransition, breath, stripes, rings, checkerboard]
+  let choice = Math.random() * choices.length | 0;
+  return rings()
+  return shapeTransition()
+ //choices[choice]();
+ //checkerboard()
+
+}, 500)
+
 
 function checkerboard() {
   customShader({
+    canvas: document.querySelector('.webgpu'),
     shader: checkerboardShader,
   });
 }
 
-let template = document.querySelector('template').innerHTML
 
-let controlpanel  =  document.querySelector('#control-panel');
+let controlPanel  = document.querySelector('select')
 
-controlpanel.innerHTML += Object.keys(demos).map(
-  title => template
-  .replace(/{replace_me}/g, title))
-  .join('\n')
 
+let stuff = Object.entries(demos).map((pair) => {
+  return `<option value='${pair[0]}'>${pair[0]}</option>`
+}).join('\n')
+controlPanel.innerHTML = stuff;
+
+
+controlPanel.addEventListener('change', function (e) {
+  let val = e.target.value
+  console.log(val)
+  demos[val]()
+})
 
 function customShader(options) {
   let start = window.location.host === "localhost:3000" ? start_loop_static : start_loop_nb;

@@ -1,6 +1,6 @@
 //from regl.examples
 import createREGL from "regl";
-let regl = createREGL({ canvas: document.querySelector(".one") });
+let regl = createREGL({ canvas: document.querySelector(".breath") });
 
 let successFunction = (stream) => {
   console.log("after get user media");
@@ -88,13 +88,13 @@ let errorFunction = (err) => {
 async function breath() {
   //navigator.webkitGetUserMedia({ audio: true }, successFunction, errorFunction);
   // .then(successFunction)
-  console.log("b4 get user media");
-  // .catch(errorFunction)
-  let stream = await navigator.mediaDevices
-    .getUserMedia({ audio: true })
-    .then(successFunction)
-    .then(errorFunction);
-  console.log("hello");
+  // console.log("b4 get user media");
+  // // .catch(errorFunction)
+  // let stream = await navigator.mediaDevices
+  //   .getUserMedia({ audio: true })
+  //   .then(successFunction)
+  //   .then(errorFunction);
+
   // .then(successFunction)
   // .catch(errorFunction);
 }

@@ -11,6 +11,10 @@ const NUM_POINTS = 100000; // 100k-200k seems reasonable
 const RADIUS1 = 0.9,
   RADIUS2 = 0.4;
 
+  const mousePosition = [0,0]
+
+  const toggle = [0, 1]
+
 /* Overview
 
    1. Generate (x1,y1) and (x2,y2) for each point. The point will move in a straight line
@@ -38,7 +42,7 @@ let shaderConfig = {
 };
 
 // See http://regl.party/ -- regl makes low level gl programming more convenient!
-const regl = createREGL({ canvas: document.querySelector(".two") });
+const regl = createREGL({ canvas: document.querySelector('.breath') });
 let shape1 = regl.buffer(NUM_POINTS),
   shape2 = regl.buffer(NUM_POINTS);
 let angles = Array.from({ length: NUM_POINTS }, (_) => TAU * Math.random());
@@ -104,15 +108,19 @@ const draw = regl({
   vert: `
         precision highp float;
         uniform float u_time, u_chromaticblur, u_spread, u_speed;
+        uniform vec2 toggle;
         attribute float a_jitter;
         attribute vec2 a_position1, a_position2;
         void main () {
-            float phase = 0.5 * (1.0 + cos(u_speed * (u_time + u_chromaticblur) + a_jitter * u_spread));
+          float phase = 0.;
+              phase = 0.5 * (1.0 + cos(u_speed * (u_time + u_chromaticblur) + a_jitter * u_spread));
             phase = smoothstep(0.1, 0.9, phase);
             // TODO: make this a parameter, as the range seems like it's interesting to play with
-            // phase = smoothstep(-0.9, 0.9, phase);
-            // phase = smoothstep(0.1, 1.5, phase);
-            gl_PointSize = 2.0; // TODO: should this be a parameter too?
+            if (toggle.x > 0.)
+            phase = smoothstep(-0.9, 0.9, phase);
+          else 
+          phase = smoothstep(0.1, 1.5, phase);
+            gl_PointSize = 8.0; // TODO: should this be a parameter too?
             gl_Position = vec4(mix(a_position1, a_position2, phase), 0, 1);
         }`,
 
@@ -136,6 +144,8 @@ const draw = regl({
     u_color: regl.prop("u_color"),
     u_chromaticblur: regl.prop("u_chromaticblur"),
     u_time: (context) => context.time,
+    u_mouse: mousePosition ,
+    toggle: toggle
   },
 
   count: NUM_POINTS,
@@ -172,7 +182,7 @@ function constructUi(config, min, max, step, needsRedraw) {
 }
 
 function redraw() {
-  regl.clear({ color: [0, 0, 0, 1], depth: 1 });
+  regl.clear({ color: [.5, .5, .5, 1], depth: 1 });
   // Chromatic blur: draw blue, cyan, green, orange, red versions of each point,
   // and have them added together using blending so they'll be white if they're
   // all present. The sums of R, G, B should be roughly equal to get white.
@@ -185,11 +195,14 @@ function redraw() {
 }
 
 function start() {
-  console.log("hi");
-  constructUi(shaderConfig, 0, 1, 0.01, false);
-  constructUi(attrConfig, 1, 20, 1, true);
-
-  createBothShapes();
-  regl.frame(redraw);
+  // console.log("hi");
+  // constructUi(shaderConfig, 0, 1, 0.01, false);
+  // constructUi(attrConfig, 1, 20, 1, true);
+  // document.body.addEventListener('click', () => {
+  //   console.log('888')
+  //   toggle[0] = toggle[0] +1
+  // })
+  // createBothShapes();
+  // regl.frame(redraw);
 }
 export default start;

@@ -87,9 +87,9 @@ console.log(options.data)
     //console.log(data.time)
     data.time = performance.now();
     //state.updateUniforms(data);
-    let next_state = state.draw(state);
+    let next_state = state.draw(state); 
     //requestAnimationFrame(test)
-    setInterval(test, 250)
+    requestAnimationFrame(test)
 //    console.log('cool', data.time)
   });
   
