@@ -131,7 +131,7 @@ function updateUniforms(stuff) {
   let values = Object.values(data);
   let uniformsArray = new Float32Array(values.length);
   uniformsArray.set(values, 0, values.length);
-  //console.log(uniformsArray)
+ 
   return createBuffer(
     gpuDevice,
     uniformsArray,
