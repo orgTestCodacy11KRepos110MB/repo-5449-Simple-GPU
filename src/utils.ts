@@ -130,8 +130,7 @@ function updateUniforms(stuff) {
   } = stuff;
   let values = Object.values(data);
   let uniformsArray = new Float32Array(values.length);
-  uniformsArray.set(values, 0, values.length);
- 
+
   return createBuffer(
     gpuDevice,
     uniformsArray,
@@ -184,7 +183,6 @@ const createBuffer = (gpuDevice, arr, usage) => {
     usage,
     mappedAtCreation: true,
   };
-  //console.log('createBuffer')
   let buffer = gpuDevice.createBuffer(desc);
   const writeArray =
     arr instanceof Uint16Array
@@ -230,22 +228,7 @@ function makeShaderModule(gpuDevice, data,shaderCode) {
   });
   return shader;
 }
-//generic functions above
-//options type sig =
-//{ canvas: optional,
-//  data: [num | video | audio | 'trees.csv' | protocol.buffer | binary data |
-//  canvasTag(2d/webgl) | promise
-//]
-//}
-//copy regl's api w/o the inner stuff
-//returns a {
-//draw
-//canvas
-//}
-// draw returns 223-226
-//state contains any interstitial datums between gpgpu compute-layers
-//may want to read texture-data back into js-land for ray-casting or saving or
-//sending via http or w/e
+
 
 function createCanvas (width=960, height=500, options={}) {
   let dpi = devicePixelRatio;
@@ -340,6 +323,7 @@ async function init(options) {
     canvas: stuff.canvas,
     updateUniforms: function (data) {
       stuff.data = data;
+      console.log(data)
       updateUniforms(stuff);
     },
   };

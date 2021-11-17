@@ -43,13 +43,8 @@ let b = {
   float: 5126,
   float32: 5126,
 };
-
-
-import init from "./utils";
-
-
+import init from "./utils"
 let helloWorld: string = "hello";
-
 //user land below
 let width = 960, height = 500;
 async function start_loop_nb() {
@@ -102,7 +97,6 @@ console.log(options.data)
   // });
 }
 
-
 function addMouseEvents(state) {
   let scaleX = scaleLinear().domain([0, 1]).range([0, 0.3]);
 
@@ -110,8 +104,6 @@ function addMouseEvents(state) {
   state.canvas.addEventListener("mousemove", function (e) {
     data.mouseX = scaleX(e.clientX / e.target.clientWidth);
     data.mouseY = scaleY(e.clientY / e.target.clientHeight);
-    ///console.log(data.time)
-    //console.log(data.mouseX, data.mouseY);
     state.updateUniforms(data);
   });
 }
