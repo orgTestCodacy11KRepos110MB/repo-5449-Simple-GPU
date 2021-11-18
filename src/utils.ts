@@ -130,6 +130,8 @@ function updateUniforms(stuff) {
   } = stuff;
   let values = Object.values(data);
   let uniformsArray = new Float32Array(values.length);
+  uniformsArray[3] = Math.random() * Date.now()
+  //todo use updated values from userland
 
   return createBuffer(
     gpuDevice,
@@ -241,8 +243,6 @@ function createCanvas (width=960, height=500, options={}) {
   // canvas.__reglConfig = {dpi, reglOptions}
   return canvas;
 }
-
-
 
 async function init(options) {
   //how to align width and hegiht from create canva

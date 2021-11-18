@@ -1,16 +1,18 @@
 import shapeTransition from "./webgl/shape-transition";
 import breath from "./webgl/breath";
 import { start_loop_static, start_loop_nb } from "../src/main";
-import ringShader from './rings.wgsl?raw';
-import stripesShader from './stripes.wgsl?raw';
-import checkerboardShader from './checkerboard.wgsl?raw';
+import ringShader from './shaders/rings.wgsl?raw';
+import stripesShader from './shaders/four.wgsl?raw';
+import checkerboardShader from './shaders/checkerboard.wgsl?raw';
 //todo add video and more 
 let demos = {
-  shapeTransition, breath, stripes, rings, checkerboard//, video
+  //shapeTransition, breath,
+  
+  stripes, rings, checkerboard//, video
 }
 
 function stripes()  {
-  video({
+  customShader({
     canvas: document.querySelector('.webgpu'),
     shader: stripesShader,
   });
@@ -24,18 +26,19 @@ function rings() {
   });
 }
 
-setTimeout(function() {
+const makeChoice = function() {
   let choices = [shapeTransition, breath, stripes, rings, checkerboard]
   let choice = Math.random() * choices.length | 0;
-  return rings()
-  return shapeTransition()
- //choices[choice]();
- //checkerboard()
+ choices[choice]();
+  //controlPanel.value = Object.keys(demos)[choice]
+  console.log(Object.keys(demos)[choice])
+}
 
-}, 500)
-
+setInterval(makeChoice, 5000)
+makeChoice()
 
 function checkerboard() {
+  //console.log('checkerboard')
   customShader({
     canvas: document.querySelector('.webgpu'),
     shader: checkerboardShader,
@@ -52,11 +55,11 @@ let stuff = Object.entries(demos).map((pair) => {
 controlPanel.innerHTML = stuff;
 
 
-controlPanel.addEventListener('change', function (e) {
-  let val = e.target.value
-  console.log(val)
-  demos[val]()
-})
+// controlPanel.addEventListener('change', function (e) {
+//   let val = e.target.value
+//   console.log(val)
+//   demos[val]()
+// })
 
 function customShader(options) {
   let start = window.location.host === "localhost:3000" ? start_loop_static : start_loop_nb;

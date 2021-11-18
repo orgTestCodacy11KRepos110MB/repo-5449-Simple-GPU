@@ -77,7 +77,7 @@ async function start_loop_static(options) {
   options.data = copiedData;
   let state = await init.init(options);
   addMouseEvents(state);
-console.log(options.data)
+//console.log(options.data)
   requestAnimationFrame(function test() {
     //console.log(data.time)
     data.time = performance.now();

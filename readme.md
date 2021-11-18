@@ -1,4 +1,8 @@
 * simple-data-texture
+intendded to interop webgpu w/ 3js and d3 and regl and whatever
+
+
+
 module for using webgpu for data visualization
 just a minimalist runtime for using shaders in nb/static website
 
