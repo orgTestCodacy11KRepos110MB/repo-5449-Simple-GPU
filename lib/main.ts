@@ -2,6 +2,7 @@
 import utils from './utils';
 // @ts-ignore
 import defaultShader from './default.wgsl?raw';
+import {step} from './step';
 
 const attribs = new Float32Array([0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]);
 
@@ -130,6 +131,9 @@ const addMouseEvents = function (canvas:any, data:any) {
 
 async function init(options:any) {
   let canvas = options.canvas || utils.createCanvas();
+  console.log(step)
+  return step(canvas)
+
   const state = { 
     renderPassDescriptor: {},
     attribsBuffer: {},
@@ -186,28 +190,6 @@ async function init(options:any) {
   draw.canvas = canvas
   return draw
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 init.version = '0.8.0';
