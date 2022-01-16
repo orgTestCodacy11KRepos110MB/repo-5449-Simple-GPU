@@ -8,31 +8,43 @@ const batch = [4, 4];
 function makeShaderModule(gpuDevice:any, data:any, source:any,) {
   //validateData(data)
   const uniforms = Object.keys(data).map((name) => `${name}: f32;`).join("\n");
-  const code = `
-   struct Uniforms {
-    ${uniforms}
-  };
-  [[group(0), binding(0)]] var<uniform> u: Uniforms;
-  // [[group(0), binding(1)]] var mySampler: sampler;
-  // [[group(0), binding(2)]] var myTexture: texture_external;
-  struct VertexInput {
-    [[location(0)]] pos: vec2<f32>;
-  };
+  const code = `[[group(0), binding(0)]] var mySampler : sampler;
+  [[group(0), binding(1)]] var myTexture : texture_2d<f32>;
+  
   struct VertexOutput {
-    [[builtin(position)]] pos: vec4<f32>;
-    [[location(0)]] uv: vec2<f32>;
+    [[builtin(position)]] Position : vec4<f32>;
+    [[location(0)]] fragUV : vec2<f32>;
   };
-
+  
   [[stage(vertex)]]
-  fn main_vertex(input: VertexInput) -> VertexOutput {
-    var output: VertexOutput;
-    var pos: vec2<f32> = input.pos * 3.0 - 1.0;
-    output.pos = vec4<f32>(pos, 0.0, 1.0);
-    output.uv = input.pos;
+  fn vert_main([[builtin(vertex_index)]] VertexIndex : u32) -> VertexOutput {
+    var pos = array<vec2<f32>, 6>(
+        vec2<f32>( 1.0,  1.0),
+        vec2<f32>( 1.0, -1.0),
+        vec2<f32>(-1.0, -1.0),
+        vec2<f32>( 1.0,  1.0),
+        vec2<f32>(-1.0, -1.0),
+        vec2<f32>(-1.0,  1.0));
+  
+    var uv = array<vec2<f32>, 6>(
+        vec2<f32>(1.0, 0.0),
+        vec2<f32>(1.0, 1.0),
+        vec2<f32>(0.0, 1.0),
+        vec2<f32>(1.0, 0.0),
+        vec2<f32>(0.0, 1.0),
+        vec2<f32>(0.0, 0.0));
+  
+    var output : VertexOutput;
+    output.Position = vec4<f32>(pos[VertexIndex], 0.0, 1.0);
+    output.fragUV = uv[VertexIndex];
     return output;
   }
-  ${source}`
-  return gpuDevice.createShaderModule({ code: fullscreenTexturedQuadWGSL });
+  
+  [[stage(fragment)]]
+  fn frag_main([[location(0)]] fragUV : vec2<f32>) -> [[location(0)]] vec4<f32> {
+    return textureSample(myTexture, mySampler, fragUV);
+  }`
+  return gpuDevice.createShaderModule({ code: code });
 }
 
 const step = async (canvasRef) => {
