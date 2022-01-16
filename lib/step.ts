@@ -4,7 +4,39 @@ import fullscreenTexturedQuadWGSL from './fullscreenTexturedQuad.wgsl?raw';
 const tileDim = 128;
 const batch = [4, 4];
 
+
+function makeShaderModule(gpuDevice:any, data:any, source:any,) {
+  //validateData(data)
+  const uniforms = Object.keys(data).map((name) => `${name}: f32;`).join("\n");
+  const code = `
+   struct Uniforms {
+    ${uniforms}
+  };
+  [[group(0), binding(0)]] var<uniform> u: Uniforms;
+  // [[group(0), binding(1)]] var mySampler: sampler;
+  // [[group(0), binding(2)]] var myTexture: texture_external;
+  struct VertexInput {
+    [[location(0)]] pos: vec2<f32>;
+  };
+  struct VertexOutput {
+    [[builtin(position)]] pos: vec4<f32>;
+    [[location(0)]] uv: vec2<f32>;
+  };
+
+  [[stage(vertex)]]
+  fn main_vertex(input: VertexInput) -> VertexOutput {
+    var output: VertexOutput;
+    var pos: vec2<f32> = input.pos * 3.0 - 1.0;
+    output.pos = vec4<f32>(pos, 0.0, 1.0);
+    output.uv = input.pos;
+    return output;
+  }
+  ${source}`
+  return gpuDevice.createShaderModule({ code: fullscreenTexturedQuadWGSL });
+}
+
 const step = async (canvasRef) => {
+  const data = {}
   const adapter = await navigator.gpu.requestAdapter();
   const device = await adapter.requestDevice();
 
@@ -35,9 +67,7 @@ const step = async (canvasRef) => {
 
   const fullscreenQuadPipeline = device.createRenderPipeline({
     vertex: {
-      module: device.createShaderModule({
-        code: fullscreenTexturedQuadWGSL,
-      }),
+      module: makeShaderModule(device, data, fullscreenTexturedQuadWGSL),
       entryPoint: 'vert_main',
     },
     fragment: {
