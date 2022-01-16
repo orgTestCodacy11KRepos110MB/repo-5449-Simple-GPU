@@ -10,6 +10,7 @@ function makeShaderModule(gpuDevice:any, data:any, source:any,) {
   const uniforms = Object.keys(data).map((name) => `${name}: f32;`).join("\n");
   const code = `[[group(0), binding(0)]] var mySampler : sampler;
   [[group(0), binding(1)]] var myTexture : texture_2d<f32>;
+
   
   struct VertexOutput {
     [[builtin(position)]] Position : vec4<f32>;
@@ -251,6 +252,7 @@ const step = async (canvasRef) => {
         binding: 1,
         resource: textures[1].createView(),
       },
+     
     ],
   });
 
