@@ -286,9 +286,8 @@ const step = async (canvasRef, data) => {
     passEncoder.draw(6, 1, 0, 0);
     passEncoder.endPass();
     device.queue.submit([commandEncoder.finish()]);
-    requestAnimationFrame(frame);
   }
-  requestAnimationFrame(frame);
+  return frame;
 };
 let defaultData = {
   width: 900,
@@ -318,5 +317,5 @@ async function init(options) {
   addMouseEvents(canvas, state.data);
   return step(canvas, options);
 }
-init.version = "0.8.0";
+init.version = "0.9.0";
 export { init };

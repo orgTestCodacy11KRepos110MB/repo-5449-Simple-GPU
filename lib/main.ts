@@ -193,7 +193,7 @@ async function init(options:any) {
 }
 
 
-init.version = '0.8.0';
+init.version = '0.9.0';
 
 export { 
   init,
