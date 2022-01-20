@@ -332,7 +332,7 @@ const step = async (canvasRef:any, data: any) => {
     //requestAnimationFrame(frame);
     
   }
- 
+  frame.canvas = canvasRef
   return frame
   //requestAnimationFrame(frame);
 };
