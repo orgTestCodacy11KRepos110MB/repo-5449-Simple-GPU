@@ -24,169 +24,277 @@ var utils = {
   createBuffer,
   createCanvas
 };
-var defaultShader = "let size = 4.0;\n\n    let b = 0.3;		//size of the smoothed border\n\n    fn mainImage(fragCoord: vec2<f32>, iResolution: vec2<f32>) -> vec4<f32> {\n      let aspect = iResolution.x/iResolution.y;\n      let position = (fragCoord.xy) * aspect;\n      let dist = distance(position, vec2<f32>(aspect*0.5, 0.5));\n      let offset=u.time * 000.0001;\n      let conv=4.;\n      let v=dist*4.-offset;\n      let ringr=floor(v);\n      \n      var stuff = 0.;\n      if (v % 3. > .5) {\n        stuff = 0.;\n      }\n\n	var color=smoothStep(-b, b, abs(dist- (ringr+stuff+offset)/conv));\n      if (ringr % 2. ==1.) {\n       color=2.-color;\n      }\n\n    let distToMouseX = distance(u.mouseX, fragCoord.x);\n    let distToMouseY = distance(u.mouseY, fragCoord.y);\n\n    return vec4<f32>(\n      distToMouseX, \n      color, \n      color, \n      1.\n      );\n  };\n\n  fn main(uv: vec2<f32>) -> vec4<f32> {\n    let fragCoord = vec2<f32>(uv.x, uv.y);\n    var base = vec4<f32>(cos(u.time * .000001), .5, sin(u.time * 0.000001), 1.);\n    let dist = distance( fragCoord, vec2<f32>(u.mouseX,  u.mouseY));\n    return mainImage(fragCoord, vec2<f32>(u.width, u.height));\n  }\n\n  [[stage(fragment)]]\n  fn main_fragment(in: VertexOutput) -> [[location(0)]] vec4<f32> {\n    return main(in.uv) - vec4<f32>(.8);\n  }\n  ";
-const attribs = new Float32Array([0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]);
-const recordRenderPass = async function(stuff) {
-  let {
-    attribsBuffer,
-    context,
-    gpuDevice,
-    pipeline,
-    uniformsBuffer,
-    renderPassDescriptor
-  } = stuff;
-  const commandEncoder = gpuDevice.createCommandEncoder();
-  const textureView = context.getCurrentTexture().createView();
-  renderPassDescriptor.colorAttachments[0].view = textureView;
-  let passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-  passEncoder.setPipeline(pipeline);
-  const bindGroup = gpuDevice.createBindGroup({
-    layout: pipeline.getBindGroupLayout(0),
-    entries: [{ binding: 0, resource: { buffer: uniformsBuffer } }]
-  });
-  passEncoder.setBindGroup(0, bindGroup);
-  passEncoder.setVertexBuffer(0, attribsBuffer);
-  passEncoder.draw(3 * 2, 1, 0, 0);
-  passEncoder.endPass();
-  gpuDevice.queue.submit([commandEncoder.finish()]);
-};
-function updateUniforms(stuff) {
-  let {
-    data,
-    gpuDevice
-  } = stuff;
-  let values = Object.values(data);
-  let uniformsArray = new Float32Array(values.length);
-  uniformsArray.set(values, 0);
-  stuff.uniformsBuffer = utils.createBuffer(gpuDevice, uniformsArray, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
-}
-function makePipeline(shader, gpuDevice) {
-  let pipelineDesc = {
-    vertex: {
-      module: shader,
-      entryPoint: "main_vertex",
-      buffers: [{
-        arrayStride: Float32Array.BYTES_PER_ELEMENT * 2,
-        attributes: [{ offset: 0, shaderLocation: 0, format: "float32x2" }]
-      }]
-    },
-    fragment: {
-      module: shader,
-      entryPoint: "main_fragment",
-      targets: [{ format: "bgra8unorm" }]
-    },
-    primitives: { topology: "triangle-list" }
-  };
-  return gpuDevice.createRenderPipeline(pipelineDesc);
-}
+var blurWGSL = "struct Params {\n  filterDim : u32;\n  blockDim : u32;\n};\n\n[[group(0), binding(0)]] var samp : sampler;\n[[group(0), binding(1)]] var<uniform> params : Params;\n[[group(1), binding(1)]] var inputTex : texture_2d<f32>;\n[[group(1), binding(2)]] var outputTex : texture_storage_2d<rgba8unorm, write>;\n\nstruct Flip {\n  value : u32;\n};\n[[group(1), binding(3)]] var<uniform> flip : Flip;\n\n// This shader blurs the input texture in one direction, depending on whether\n// |flip.value| is 0 or 1.\n// It does so by running (128 / 4) threads per workgroup to load 128\n// texels into 4 rows of shared memory. Each thread loads a\n// 4 x 4 block of texels to take advantage of the texture sampling\n// hardware.\n// Then, each thread computes the blur result by averaging the adjacent texel values\n// in shared memory.\n// Because we're operating on a subset of the texture, we cannot compute all of the\n// results since not all of the neighbors are available in shared memory.\n// Specifically, with 128 x 128 tiles, we can only compute and write out\n// square blocks of size 128 - (filterSize - 1). We compute the number of blocks\n// needed in Javascript and dispatch that amount.\n\nvar<workgroup> tile : array<array<vec3<f32>, 128>, 4>;\n\n[[stage(compute), workgroup_size(32, 1, 1)]]\nfn main(\n  [[builtin(workgroup_id)]] WorkGroupID : vec3<u32>,\n  [[builtin(local_invocation_id)]] LocalInvocationID : vec3<u32>\n) {\n  let filterOffset : u32 = (params.filterDim - 1u) / 2u;\n  let dims : vec2<i32> = textureDimensions(inputTex, 0);\n\n  let baseIndex = vec2<i32>(\n    WorkGroupID.xy * vec2<u32>(params.blockDim, 4u) +\n    LocalInvocationID.xy * vec2<u32>(4u, 1u)\n  ) - vec2<i32>(i32(filterOffset), 0);\n\n  for (var r : u32 = 0u; r < 4u; r = r + 1u) {\n    for (var c : u32 = 0u; c < 4u; c = c + 1u) {\n      var loadIndex = baseIndex + vec2<i32>(i32(c), i32(r));\n      if (flip.value != 0u) {\n        loadIndex = loadIndex.yx;\n      }\n\n      tile[r][4u * LocalInvocationID.x + c] =\n        textureSampleLevel(inputTex, samp,\n          (vec2<f32>(loadIndex) + vec2<f32>(0.25, 0.25)) / vec2<f32>(dims), 0.0).rgb;\n    }\n  }\n\n  workgroupBarrier();\n\n  for (var r : u32 = 0u; r < 4u; r = r + 1u) {\n    for (var c : u32 = 0u; c < 4u; c = c + 1u) {\n      var writeIndex = baseIndex + vec2<i32>(i32(c), i32(r));\n      if (flip.value != 0u) {\n        writeIndex = writeIndex.yx;\n      }\n\n      let center : u32 = 4u * LocalInvocationID.x + c;\n      if (center >= filterOffset &&\n          center < 128u - filterOffset &&\n          all(writeIndex < dims)) {\n        var acc : vec3<f32> = vec3<f32>(0.0, 0.0, 0.0);\n        for (var f : u32 = 0u; f < params.filterDim; f = f + 1u) {\n          var i : u32 = center + f - filterOffset;\n          acc = acc + (1.0 / f32(params.filterDim)) * tile[r][i];\n        }\n        textureStore(outputTex, writeIndex, vec4<f32>(acc, 1.0));\n      }\n    }\n  }\n}\n";
+var fullscreenTexturedQuadWGSL = "[[group(0), binding(0)]] var mySampler : sampler;\n[[group(0), binding(1)]] var myTexture : texture_2d<f32>;\n\nstruct VertexOutput {\n  [[builtin(position)]] Position : vec4<f32>;\n  [[location(0)]] fragUV : vec2<f32>;\n};\n\n[[stage(vertex)]]\nfn vert_main([[builtin(vertex_index)]] VertexIndex : u32) -> VertexOutput {\n  var pos = array<vec2<f32>, 6>(\n      vec2<f32>( 1.0,  1.0),\n      vec2<f32>( 1.0, -1.0),\n      vec2<f32>(-1.0, -1.0),\n      vec2<f32>( 1.0,  1.0),\n      vec2<f32>(-1.0, -1.0),\n      vec2<f32>(-1.0,  1.0));\n\n  var uv = array<vec2<f32>, 6>(\n      vec2<f32>(1.0, 0.0),\n      vec2<f32>(1.0, 1.0),\n      vec2<f32>(0.0, 1.0),\n      vec2<f32>(1.0, 0.0),\n      vec2<f32>(0.0, 1.0),\n      vec2<f32>(0.0, 0.0));\n\n  var output : VertexOutput;\n  output.Position = vec4<f32>(pos[VertexIndex], 0.0, 1.0);\n  output.fragUV = uv[VertexIndex];\n  return output;\n}\n\n[[stage(fragment)]]\nfn frag_main([[location(0)]] fragUV : vec2<f32>) -> [[location(0)]] vec4<f32> {\n  return textureSample(myTexture, mySampler, fragUV);\n}\n";
+const tileDim = 128;
+const batch = [4, 4];
 function makeShaderModule(gpuDevice, data, source) {
-  if (!source)
-    source = defaultShader;
-  validateData(data);
-  const uniforms = Object.keys(data).map((name) => `${name}: f32;`).join("\n");
-  const code = `
-   struct Uniforms {
-    ${uniforms}
-  };
-  [[group(0), binding(0)]] var<uniform> u: Uniforms;
-  // [[group(0), binding(1)]] var mySampler: sampler;
-  // [[group(0), binding(2)]] var myTexture: texture_external;
-  struct VertexInput {
-    [[location(0)]] pos: vec2<f32>;
-  };
-  struct VertexOutput {
-    [[builtin(position)]] pos: vec4<f32>;
-    [[location(0)]] uv: vec2<f32>;
-  };
+  Object.keys(data).map((name) => `${name}: f32;`).join("\n");
+  const code = `[[group(0), binding(0)]] var mySampler : sampler;
+  [[group(0), binding(1)]] var myTexture : texture_2d<f32>;
 
+  
+  struct VertexOutput {
+    [[builtin(position)]] Position : vec4<f32>;
+    [[location(0)]] fragUV : vec2<f32>;
+  };
+  
   [[stage(vertex)]]
-  fn main_vertex(input: VertexInput) -> VertexOutput {
-    var output: VertexOutput;
-    var pos: vec2<f32> = input.pos * 3.0 - 1.0;
-    output.pos = vec4<f32>(pos, 0.0, 1.0);
-    output.uv = input.pos;
+  fn vert_main([[builtin(vertex_index)]] VertexIndex : u32) -> VertexOutput {
+    var pos = array<vec2<f32>, 6>(
+        vec2<f32>( 1.0,  1.0),
+        vec2<f32>( 1.0, -1.0),
+        vec2<f32>(-1.0, -1.0),
+        vec2<f32>( 1.0,  1.0),
+        vec2<f32>(-1.0, -1.0),
+        vec2<f32>(-1.0,  1.0));
+  
+    var uv = array<vec2<f32>, 6>(
+        vec2<f32>(1.0, 0.0),
+        vec2<f32>(1.0, 1.0),
+        vec2<f32>(0.0, 1.0),
+        vec2<f32>(1.0, 0.0),
+        vec2<f32>(0.0, 1.0),
+        vec2<f32>(0.0, 0.0));
+  
+    var output : VertexOutput;
+    output.Position = vec4<f32>(pos[VertexIndex], 0.0, 1.0);
+    output.fragUV = uv[VertexIndex];
     return output;
   }
-  ${source}`;
+  
+  [[stage(fragment)]]
+  fn frag_main([[location(0)]] fragUV : vec2<f32>) -> [[location(0)]] vec4<f32> {
+    return textureSample(myTexture, mySampler, fragUV);
+  }`;
   return gpuDevice.createShaderModule({ code });
 }
-let defaultData = {
-  width: 900,
-  height: 500,
-  pixelRatio: 2,
-  time: 0,
-  mouseX: 0,
-  mouseY: 0,
-  angle: 0
-};
-function validateData(data) {
-  if (typeof data.width !== "number")
-    throw new Error("bad data!!");
-}
-const addMouseEvents = function(canvas, data) {
-  canvas.addEventListener("mousemove", (event) => {
-    let x = event.pageX;
-    let y = event.pageY;
-    data.mouseX = x / event.target.clientWidth;
-    data.mouseY = y / event.target.clientHeight;
-  });
-};
-async function init(options) {
-  let canvas = options.canvas || utils.createCanvas();
-  const state = {
-    renderPassDescriptor: {},
-    attribsBuffer: {},
-    data: Object.assign(defaultData, options.data)
-  };
-  addMouseEvents(canvas, state.data);
-  const context = canvas.getContext("webgpu");
+const step = async (canvasRef) => {
+  const data = {};
   const adapter = await navigator.gpu.requestAdapter();
-  const gpuDevice = await (adapter == null ? void 0 : adapter.requestDevice());
-  const presentationFormat = context.getPreferredFormat(adapter);
+  const device = await adapter.requestDevice();
+  const context = canvasRef.getContext("webgpu");
+  const devicePixelRatio2 = window.devicePixelRatio || 1;
   const presentationSize = [
-    canvas.width * devicePixelRatio,
-    canvas.height * devicePixelRatio
+    canvasRef.clientWidth * devicePixelRatio2,
+    canvasRef.clientHeight * devicePixelRatio2
   ];
-  Object.assign(state, {
-    gpuDevice,
-    context,
-    adapter
-  });
+  const presentationFormat = context.getPreferredFormat(adapter);
   context.configure({
-    device: gpuDevice,
+    device,
     format: presentationFormat,
     size: presentationSize
   });
-  let shader = makeShaderModule(gpuDevice, state.data, options.shader);
-  const pipeline = makePipeline(shader, gpuDevice);
-  const textureView = context.getCurrentTexture().createView();
-  const renderPassDescriptor = {
-    colorAttachments: [
+  const blurPipeline = device.createComputePipeline({
+    compute: {
+      module: device.createShaderModule({
+        code: blurWGSL
+      }),
+      entryPoint: "main"
+    }
+  });
+  const fullscreenQuadPipeline = device.createRenderPipeline({
+    vertex: {
+      module: makeShaderModule(device, data),
+      entryPoint: "vert_main"
+    },
+    fragment: {
+      module: device.createShaderModule({
+        code: fullscreenTexturedQuadWGSL
+      }),
+      entryPoint: "frag_main",
+      targets: [
+        {
+          format: presentationFormat
+        }
+      ]
+    },
+    primitive: {
+      topology: "triangle-list"
+    }
+  });
+  const sampler = device.createSampler({
+    magFilter: "linear",
+    minFilter: "linear"
+  });
+  const img = document.createElement("img");
+  img.src = "/late.png";
+  await img.decode();
+  const imageBitmap = await createImageBitmap(img);
+  const [srcWidth, srcHeight] = [imageBitmap.width, imageBitmap.height];
+  const cubeTexture = device.createTexture({
+    size: [srcWidth, srcHeight, 1],
+    format: "rgba8unorm",
+    usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT
+  });
+  device.queue.copyExternalImageToTexture({ source: imageBitmap }, { texture: cubeTexture }, [imageBitmap.width, imageBitmap.height]);
+  const textures = [0, 1].map(() => {
+    return device.createTexture({
+      size: {
+        width: srcWidth,
+        height: srcHeight
+      },
+      format: "rgba8unorm",
+      usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING
+    });
+  });
+  const buffer0 = (() => {
+    const buffer = device.createBuffer({
+      size: 4,
+      mappedAtCreation: true,
+      usage: GPUBufferUsage.UNIFORM
+    });
+    new Uint32Array(buffer.getMappedRange())[0] = 0;
+    buffer.unmap();
+    return buffer;
+  })();
+  const buffer1 = (() => {
+    const buffer = device.createBuffer({
+      size: 4,
+      mappedAtCreation: true,
+      usage: GPUBufferUsage.UNIFORM
+    });
+    new Uint32Array(buffer.getMappedRange())[0] = 1;
+    buffer.unmap();
+    return buffer;
+  })();
+  const blurParamsBuffer = device.createBuffer({
+    size: 8,
+    usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.UNIFORM
+  });
+  const computeConstants = device.createBindGroup({
+    layout: blurPipeline.getBindGroupLayout(0),
+    entries: [
       {
-        view: textureView,
-        loadValue: { r: 0, g: 0, b: 0, a: 1 },
-        storeOp: "store"
+        binding: 0,
+        resource: sampler
+      },
+      {
+        binding: 1,
+        resource: {
+          buffer: blurParamsBuffer
+        }
       }
     ]
-  };
-  state.renderPassDescriptor = renderPassDescriptor;
-  Object.assign(state, {
-    textureView,
-    renderPassDescriptor,
-    pipeline
   });
-  state.attribsBuffer = utils.createBuffer(gpuDevice, attribs, GPUBufferUsage.VERTEX);
-  function draw(newData) {
-    if (!newData.time)
-      newData.time = performance.now();
-    Object.assign(state.data, newData);
-    updateUniforms(state);
-    recordRenderPass(state);
-    return draw;
+  const computeBindGroup0 = device.createBindGroup({
+    layout: blurPipeline.getBindGroupLayout(1),
+    entries: [
+      {
+        binding: 1,
+        resource: cubeTexture.createView()
+      },
+      {
+        binding: 2,
+        resource: textures[0].createView()
+      },
+      {
+        binding: 3,
+        resource: {
+          buffer: buffer0
+        }
+      }
+    ]
+  });
+  const computeBindGroup1 = device.createBindGroup({
+    layout: blurPipeline.getBindGroupLayout(1),
+    entries: [
+      {
+        binding: 1,
+        resource: textures[0].createView()
+      },
+      {
+        binding: 2,
+        resource: textures[1].createView()
+      },
+      {
+        binding: 3,
+        resource: {
+          buffer: buffer1
+        }
+      }
+    ]
+  });
+  const computeBindGroup2 = device.createBindGroup({
+    layout: blurPipeline.getBindGroupLayout(1),
+    entries: [
+      {
+        binding: 1,
+        resource: textures[1].createView()
+      },
+      {
+        binding: 2,
+        resource: textures[0].createView()
+      },
+      {
+        binding: 3,
+        resource: {
+          buffer: buffer0
+        }
+      }
+    ]
+  });
+  const showResultBindGroup = device.createBindGroup({
+    layout: fullscreenQuadPipeline.getBindGroupLayout(0),
+    entries: [
+      {
+        binding: 0,
+        resource: sampler
+      },
+      {
+        binding: 1,
+        resource: textures[1].createView()
+      }
+    ]
+  });
+  const settings = {
+    filterSize: 15,
+    iterations: 2
+  };
+  let blockDim;
+  const updateSettings = () => {
+    blockDim = tileDim - (settings.filterSize - 1);
+    device.queue.writeBuffer(blurParamsBuffer, 0, new Uint32Array([settings.filterSize, blockDim]));
+  };
+  updateSettings();
+  function frame() {
+    const commandEncoder = device.createCommandEncoder();
+    const computePass = commandEncoder.beginComputePass();
+    computePass.setPipeline(blurPipeline);
+    computePass.setBindGroup(0, computeConstants);
+    computePass.setBindGroup(1, computeBindGroup0);
+    computePass.dispatch(Math.ceil(srcWidth / blockDim), Math.ceil(srcHeight / batch[1]));
+    computePass.setBindGroup(1, computeBindGroup1);
+    computePass.dispatch(Math.ceil(srcHeight / blockDim), Math.ceil(srcWidth / batch[1]));
+    for (let i = 0; i < settings.iterations - 1; ++i) {
+      computePass.setBindGroup(1, computeBindGroup2);
+      computePass.dispatch(Math.ceil(srcWidth / blockDim), Math.ceil(srcHeight / batch[1]));
+      computePass.setBindGroup(1, computeBindGroup1);
+      computePass.dispatch(Math.ceil(srcHeight / blockDim), Math.ceil(srcWidth / batch[1]));
+    }
+    computePass.endPass();
+    const passEncoder = commandEncoder.beginRenderPass({
+      colorAttachments: [
+        {
+          view: context.getCurrentTexture().createView(),
+          loadValue: { r: 0, g: 0, b: 0, a: 1 },
+          storeOp: "store"
+        }
+      ]
+    });
+    passEncoder.setPipeline(fullscreenQuadPipeline);
+    passEncoder.setBindGroup(0, showResultBindGroup);
+    passEncoder.draw(6, 1, 0, 0);
+    passEncoder.endPass();
+    device.queue.submit([commandEncoder.finish()]);
+    requestAnimationFrame(frame);
   }
-  draw.canvas = canvas;
-  return draw;
+  requestAnimationFrame(frame);
+};
+async function init(options) {
+  let canvas = options.canvas || utils.createCanvas();
+  console.log(step);
+  return step(canvas);
 }
-init.version = "0.0.7";
-console.log(init);
+init.version = "0.8.0";
 export { init };

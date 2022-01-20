@@ -48,7 +48,7 @@ function makeShaderModule(gpuDevice:any, data:any, source:any,) {
   return gpuDevice.createShaderModule({ code: code });
 }
 
-const step = async (canvasRef) => {
+const step = async (canvasRef:any) => {
   const data = {}
   const adapter = await navigator.gpu.requestAdapter();
   const device = await adapter.requestDevice();
