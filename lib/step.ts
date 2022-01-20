@@ -329,9 +329,12 @@ const step = async (canvasRef:any, data: any) => {
     passEncoder.endPass();
     device.queue.submit([commandEncoder.finish()]);
 
-    requestAnimationFrame(frame);
+    //requestAnimationFrame(frame);
+    
   }
-  requestAnimationFrame(frame);
+ 
+  return frame
+  //requestAnimationFrame(frame);
 };
 
 
