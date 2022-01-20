@@ -69,8 +69,7 @@ function makeShaderModule(gpuDevice, data, source) {
   }`;
   return gpuDevice.createShaderModule({ code });
 }
-const step = async (canvasRef) => {
-  const data = {};
+const step = async (canvasRef, data) => {
   const adapter = await navigator.gpu.requestAdapter();
   const device = await adapter.requestDevice();
   const context = canvasRef.getContext("webgpu");
@@ -117,8 +116,8 @@ const step = async (canvasRef) => {
     magFilter: "linear",
     minFilter: "linear"
   });
-  const img = document.createElement("img");
-  img.src = "/late.png";
+  const img = data.img;
+  console.log("data", data);
   await img.decode();
   const imageBitmap = await createImageBitmap(img);
   const [srcWidth, srcHeight] = [imageBitmap.width, imageBitmap.height];
@@ -291,10 +290,33 @@ const step = async (canvasRef) => {
   }
   requestAnimationFrame(frame);
 };
+let defaultData = {
+  width: 900,
+  height: 500,
+  pixelRatio: 2,
+  time: 0,
+  mouseX: 0,
+  mouseY: 0,
+  angle: 0
+};
+const addMouseEvents = function(canvas, data) {
+  canvas.addEventListener("mousemove", (event) => {
+    let x = event.pageX;
+    let y = event.pageY;
+    data.mouseX = x / event.target.clientWidth;
+    data.mouseY = y / event.target.clientHeight;
+  });
+};
 async function init(options) {
   let canvas = options.canvas || utils.createCanvas();
   console.log(step);
-  return step(canvas);
+  const state = {
+    renderPassDescriptor: {},
+    attribsBuffer: {},
+    data: Object.assign(defaultData, options.data)
+  };
+  addMouseEvents(canvas, state.data);
+  return step(canvas, options);
 }
 init.version = "0.8.0";
 export { init };

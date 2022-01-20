@@ -132,7 +132,7 @@ const addMouseEvents = function (canvas:any, data:any) {
 async function init(options:any) {
   let canvas = options.canvas || utils.createCanvas();
   console.log(step)
-  return step(canvas)
+
 
   const state = { 
     renderPassDescriptor: {},
@@ -140,7 +140,8 @@ async function init(options:any) {
     data: Object.assign(defaultData, options.data)
   };
   addMouseEvents(canvas, state.data)
-
+  
+  return step(canvas, options)
   const context = canvas.getContext("webgpu");
   const adapter = await navigator.gpu.requestAdapter();
   const gpuDevice = await adapter?.requestDevice();

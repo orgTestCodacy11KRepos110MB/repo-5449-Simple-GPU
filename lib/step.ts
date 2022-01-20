@@ -48,8 +48,7 @@ function makeShaderModule(gpuDevice:any, data:any, source:any,) {
   return gpuDevice.createShaderModule({ code: code });
 }
 
-const step = async (canvasRef:any) => {
-  const data = {}
+const step = async (canvasRef:any, data: any) => {
   const adapter = await navigator.gpu.requestAdapter();
   const device = await adapter.requestDevice();
 
@@ -104,8 +103,9 @@ const step = async (canvasRef:any) => {
     minFilter: 'linear',
   });
 
-  const img = document.createElement('img');
-  img.src = ('/late.png');
+  
+  const img = data.img
+  console.log('data',data)
   await img.decode();
   const imageBitmap = await createImageBitmap(img);
 

@@ -50,10 +50,14 @@ function select(name) {
 
   cleanup() 
   document.querySelectorAll('input')[idx].checked = true
+  let img = document.createElement('img')
+  img.src = './late.png'
+  console.log(img)
   if (typeof demo === 'function') demo()
   else {
     customShader({
       shader: demo,
+      img: img
     }); 
   }
 }
