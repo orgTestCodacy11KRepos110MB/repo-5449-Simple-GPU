@@ -17,6 +17,6 @@
     "allowJs": true
 
   },
-  "include": ["lib"],
+  "include": ["lib", "demos/blur.js", "demos/blur.js"],
   "files": ["lib/main.ts"],
 }

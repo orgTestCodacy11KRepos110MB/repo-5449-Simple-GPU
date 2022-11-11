@@ -45,6 +45,7 @@ let makeCompute = (state:any) => {
     particleBuffers[i].unmap();
   }
 
+  //rename this
   const simParamBufferSize = 7 * Float32Array.BYTES_PER_ELEMENT;
   state.simParamBuffer = device.createBuffer({
     size: simParamBufferSize,
@@ -114,7 +115,6 @@ let makeCompute = (state:any) => {
             size: state.compute.buffers.byteLength,
           },
         },
-    
       ],
     });
   }
@@ -128,20 +128,19 @@ let makeCompute = (state:any) => {
 };
 
 let hasMadeCompute = false;
-// let makeImgTexture = async (state:any) => {
-//   const img = document.createElement("img");
-//   const source = img;
-//   source.width = innerWidth;
-//   source.height = innerHeight;
-//   //console.log(state.data.texture);
-//   //console.log(img)
-//   img.src = state.data.texture
-//   console.log(img.src);
+let makeImgTexture = async (state:any) => {
+  const img = document.createElement("img");
+  const source = img;
+  source.width = innerWidth;
+  source.height = innerHeight;
+  console.log(123);
+  img.src = state.data.texture
+  console.log(img.src);
 
-//   await img.decode();
+  await img.decode();
 
-//   return await createImageBitmap(img);
-// };
+  return await createImageBitmap(img);
+};
 
 async function makeTexture(state:any) {
   let cubeTexture = state.device.createTexture({
@@ -167,8 +166,6 @@ async function makeTexture(state:any) {
       )
   );
   
-  
-
   state.cubeTexture = cubeTexture;
   state.data.music = music;
  
@@ -185,7 +182,7 @@ function updateTexture(state:any) {
     new Array(1024)
       .fill(5)
       .map((d, i) => {
-        console.log(d)
+        //console.log(d)
        return  state.data.texture
           ? state.data.texture[i % state.data.texture.length]
           : Math.random()
@@ -286,6 +283,8 @@ const recordRenderPass = async function (state: any) {
 };
 function updateUniforms(state: any) {
   let { data, device } = state;
+
+
 
   let values: any = Object.values(data).filter(
     (val) => typeof val !== "object"
@@ -548,8 +547,7 @@ function makeShaderModule(state:any, source: any) {
   }
   ${source}`;
 
-console.log(123123);
-console.log(code)
+
   return state.compute
     ? device.createShaderModule({ code: state.compute.vs + state.compute.fs })
     : device.createShaderModule({ code });
@@ -630,5 +628,6 @@ async function init(options: any) {
   return draw;
 }
 
+const abc = ``
 init.version = '0.6.0';
 export { init };

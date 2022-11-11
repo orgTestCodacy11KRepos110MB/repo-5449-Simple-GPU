@@ -12,20 +12,19 @@ fn smoothStep(edge0:f32, edge1:f32, x:f32) -> f32 {
 
   return c * c * (3 - 2 * c);
 }
-
-    fn mainImage(fragCoord: vec2<f32>, iResolution: vec2<f32>) -> vec4<f32> {
-      let aspect = iResolution.x/iResolution.y;
-      let position = (fragCoord.xy) * aspect;
-      let dist = distance(position, vec2<f32>(aspect*0.5, 0.5));
-      let offset=u.time * 000.001;
-      let conv=4.;
-      let v=dist*4.-offset;
-      let ringr=floor(v);
-      
-      var stuff = 0.;
-      if (v % 3. > .5) {
-        stuff = 0.;
-      }
+  fn mainImage(fragCoord: vec2<f32>, iResolution: vec2<f32>) -> vec4<f32> {
+    let aspect = iResolution.x/iResolution.y;
+    let position = (fragCoord.xy) * aspect;
+    let dist = distance(position, vec2<f32>(aspect*0.5, 0.5));
+    let offset=u.time * 000.001;
+    let conv=4.;
+    let v=dist*4.-offset;
+    let ringr=floor(v);
+    
+    var stuff = 0.;
+    if (v % 3. > .5) {
+      stuff = 0.;
+    }
 
 	var color=smoothStep(-b, b, abs(dist- (ringr+stuff+offset)/conv));
       if (ringr % 2. ==1.) {
