@@ -14,7 +14,6 @@ import five from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/five.wgsl?r
 // import hello from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/morning.wgsl?raw'
 import music from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/music.wgsl?raw'
 
-
 import six from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/six.wgsl?raw'
 
 import seven from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/seven.wgsl?raw'
@@ -23,11 +22,11 @@ import light from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/light.wgsl
 
 //import halfBaked from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/halfBaked.wgsl?raw'
 
-import physics from "./webgl/physics";
+import physics from "./physics";
 
 import blur from "./blur";
 
-let defaultDemo = 'texture';
+let defaultDemo = 'physics';
 let data = {}
 let stuff 
 function then(stream) {

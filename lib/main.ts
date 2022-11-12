@@ -35,17 +35,17 @@ let makeCompute = (state:any) => {
   const particleBindGroups: GPUBindGroup[] = new Array(2);
   for (let i = 0; i < 2; ++i) {
     particleBuffers[i] = device.createBuffer({
-      size: state.compute.buffers.byteLength,
+      size: state.compute.buffers[i].byteLength,
       usage: GPUBufferUsage.VERTEX | GPUBufferUsage.STORAGE,
       mappedAtCreation: true,
-    });
+    }); 
     new Float32Array(particleBuffers[i].getMappedRange()).set(
       state.compute.buffers
     );
     particleBuffers[i].unmap();
   }
 
-  //rename this
+
   const simParamBufferSize = 7 * Float32Array.BYTES_PER_ELEMENT;
   state.simParamBuffer = device.createBuffer({
     size: simParamBufferSize,
@@ -218,6 +218,10 @@ function createRenderPasses(state:any) {
   //   passEncoder = device.createRenderBundleEncoder({
   //     colorFormats: ['rgb10a2unorm']
   //   }
+  // vertex buffers 
+  // state.data
+
+
   const bindGroup = device.createBindGroup(state.bindGroupDescriptor);
 
   state.renderPasses = []
@@ -226,6 +230,10 @@ function createRenderPasses(state:any) {
     bindGroup: particleBindGroups,
     dispatchWorkGroups: Math.ceil(state.compute.buffers.length / 64),
     type: "compute",
+    vertexBuffers: [
+      state.data.compute.buffers[0], 
+      state.spriteVertexBuffer
+    ]
   },)
 
   const mainRenderPass =  {
@@ -235,10 +243,11 @@ function createRenderPasses(state:any) {
     bindGroup: bindGroup,
     type: "draw",
   }
+  
     //@ts-ignore
   if (state.compute) mainRenderPass.numVertices =  state.compute.buffers.length / 4
     //@ts-ignore
-  if (state.compute) mainRenderPass.vertexBuffers = [particleBuffers[0], spriteVertexBuffer]
+  if (state.compute) mainRenderPass.vertexBuffers = []
   state.renderPasses.push(mainRenderPass)
 
 }

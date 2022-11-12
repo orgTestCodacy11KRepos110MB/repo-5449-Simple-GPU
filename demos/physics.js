@@ -1,16 +1,7 @@
-import { init } from "../../lib/main";
-import updateSpritesWGSL from "../shaders/updateSprites.wgsl?raw";
-import spriteWGSLFS from '../shaders/sprite_fs.wgsl?raw';
-import spriteWGSLVS from '../shaders/sprite_vs.wgsl?raw';
-
-//should be two draw calls
-//drawCompute()
-//drawScreen()
-
-//draw() - schedules a draw to happen in the next frame 
-//in main_run_loop 
-  //renderPipelines.exec()
-//water = init(options)
+import { init } from "../lib/main";
+import updateSpritesWGSL from "./shaders/updateSprites.wgsl?raw";
+import spriteWGSLFS from './shaders/sprite_fs.wgsl?raw';
+import spriteWGSLVS from './shaders/sprite_vs.wgsl?raw';
 
 const numParticles = 1500;
 const initialParticleData = new Float32Array(numParticles * 4);
@@ -30,7 +21,7 @@ let data = {}
 const options = {
   data: {},
   compute: { //optional
-  buffers: initialParticleData,
+    buffers: initialParticleData,
   vs: spriteWGSLVS,
   fs: spriteWGSLFS,
   cs: updateSpritesWGSL,
