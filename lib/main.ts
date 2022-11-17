@@ -548,7 +548,7 @@ function makeComputePass(state) {
 async function compile(state, options) {
   state.renderPasses = []
   if (state.compute) {
-    if (state.compute.cs)
+//    if (state.compute.cs)
      state.renderPasses.push(makeComputePass(state))
   }
 
@@ -557,6 +557,8 @@ async function compile(state, options) {
   state.shader = makeShaderModule(state, shaderCode);
   state.pipeline = await makePipeline(state);
   createRenderPasses(state);
+
+  console.log(state.renderPasses)
 }
 
 let defaultData = {

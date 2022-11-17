@@ -26,10 +26,15 @@ import postProcessing from "./postProcessing";
 import signalvsNoise from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/signal.wgsl?raw'
 import yay from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/yay.wgsl?raw'
 
+
+import kaleidoscope from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/kaleidoscope.wgsl?raw'
+
+import sunThing from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/sun-thing.wgsl?raw'
+
 import { image } from "d3";
 
 
-let defaultDemo = 'yay';
+let defaultDemo = 'kaleidoscope';
 let data = {}
 
 async function start_loop_static(options) {
@@ -55,14 +60,14 @@ async function start_loop_static(options) {
 let demoTitles = [
   'signalvsNoise',  'stripes', 'rings', 'checkerboard', 'one', 'mouse', 'texture', 'yay', 'sky', 
   'four', 'five', 'music', 'six', 'seven', 'light', 'physics', 
-  'postProcessing', 
+  'postProcessing', 'sunThing', 'kaleidoscope'
 ]
 
 let demos = [
   signalvsNoise,  stripes, rings, checkerboard, one, mouse, texture, yay,
   sky,
 
-   four, five, music, six, seven, light, physics, postProcessing
+   four, five, music, six, seven, light, physics, postProcessing, sunThing, kaleidoscope
 ]
 
 
