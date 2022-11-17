@@ -557,8 +557,6 @@ async function compile(state, options) {
   state.shader = makeShaderModule(state, shaderCode);
   state.pipeline = await makePipeline(state);
   createRenderPasses(state);
-
-  console.log(state.renderPasses)
 }
 
 let defaultData = {
