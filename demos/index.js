@@ -24,9 +24,12 @@ import physics from "./webgl/physics";
 import postProcessing from "./postProcessing";
 
 import signalvsNoise from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/signal.wgsl?raw'
+import yay from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/yay.wgsl?raw'
+
 import { image } from "d3";
 
-let defaultDemo = 'physics';
+
+let defaultDemo = 'yay';
 let data = {}
 
 async function start_loop_static(options) {
@@ -36,7 +39,6 @@ async function start_loop_static(options) {
   //options.data.texture = '../data/static.jpg';
   const img = new Image();
   img.src = '../data/static.jpg';
-
   options.data.texture =  img
 
   let draw = await init(options);
@@ -51,13 +53,14 @@ async function start_loop_static(options) {
 }
 
 let demoTitles = [
-  'signalvsNoise',  'stripes', 'rings', 'checkerboard', 'one', 'mouse', 'texture', 'sky', 
+  'signalvsNoise',  'stripes', 'rings', 'checkerboard', 'one', 'mouse', 'texture', 'yay', 'sky', 
   'four', 'five', 'music', 'six', 'seven', 'light', 'physics', 
   'postProcessing', 
 ]
 
 let demos = [
-  signalvsNoise,  stripes, rings, checkerboard, one, mouse, texture, sky,
+  signalvsNoise,  stripes, rings, checkerboard, one, mouse, texture, yay,
+  sky,
 
    four, five, music, six, seven, light, physics, postProcessing
 ]
@@ -68,32 +71,6 @@ let demos = [
       select(event.target.value)
     })
   })
-
-
-
-// function select(name) {
-//   let idx = demoTitles.indexOf(name);
-//   let demo = demos[idx];
-
-//   cleanup() 
-//   customShader({
-//     shader: demo
-//   })
-//   // document.querySelectorAll('input')[idx].checked = true
-//   // if (typeof demo === 'function') demo()
-//   // else {
-//   //   customShader({
-//   //     shader: demo,
-//   //   }); 
-//   // }
-// }
-
-function cleanup () {
-  // document.querySelector(':checked').checked = null  
-  // let canvas = document.querySelector('canvas')
-  
-  // if (canvas) canvas.remove()
-}
 
 function customShader(options) {
   let start = window.location.host === "localhost:3000" ? start_loop_static : start_loop_nb;
@@ -108,7 +85,8 @@ function select(name) {
     customShader({
       shader: demo,
     }); 
-    else demo()
+    else 
+     demo()
 }
 
 select(document.querySelector(':checked').value)

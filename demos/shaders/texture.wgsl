@@ -9,6 +9,6 @@
     var o = f32(q);
     var cubemapVec = fragPosition.xy;
 
-    //return vec4<f32>(fragPosition.rg, .0, 1.) + sin(u.time * .01);
+  //return vec4<f32>(fragPosition.rg, .0, 1.) + sin(u.time * .01);
    return textureSample(myTexture, mySampler, cubemapVec * vec2(sin(u.time * .0001), 1.));
 }
