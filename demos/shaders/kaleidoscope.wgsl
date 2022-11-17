@@ -14,9 +14,9 @@ var activeTime = u.time * speed_modifier;
 var col = vec3<f32>(0);
 var timeMorph = 0.0;
 
-var p = -1.0 + 4.0 * fragPosition.xy / vec2<f32>(u.width, u.height);
+var p = -1.0 + 4.0 * (fragPosition.xy * 100.) / vec2<f32>(u.width, u.height);
 
-p *= 7.0;
+p *= 99.0;
 
 var a = atan2(p.x, p.y);
 var r = sqrt(dot(p, p));
