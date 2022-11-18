@@ -241,8 +241,6 @@ const recordRenderPass = async function (state: any) {
 
       //bindGroupLayout
       //bindGroup
-
-
     if (_.vertexBuffers)
       _.vertexBuffers.forEach(function (vertexBuffer: any, i: any) {
         passEncoder.setVertexBuffer(i, vertexBuffer);
@@ -354,10 +352,13 @@ async function makePipeline(state: any) {
     );
   }
   const sampler = device.createSampler({
+    addressModeU: 'repeat',
+    addressModeV: 'repeat',
     magFilter: "linear",
     minFilter: "linear",
-    mipmapFilter: "nearest",
+    mipmapFilter: "linear",
   });
+
 
   const bindGroupLayout = device.createBindGroupLayout({
     entries: [
@@ -389,7 +390,6 @@ async function makePipeline(state: any) {
 
   state.bindGroupLayout = bindGroupLayout;
   updateUniforms(state);
-
 
   let pipeline = device.createRenderPipeline({
     ...pipelineDesc,
@@ -423,6 +423,7 @@ async function makePipeline(state: any) {
       },
     ],
   };
+
 
   state.bindGroupDescriptor.entries[0].resource.buffer = updateUniforms(state);
 
@@ -507,6 +508,8 @@ function makeComputePass(state) {
         entryPoint: "main",
       },
     });
+
+
   if (state.compute.buffers) {
     state.particleBindGroups = state.compute.buffers.map(function (d:any, i:any) {
       return device.createBindGroup({
@@ -544,7 +547,6 @@ function makeComputePass(state) {
       // state.particleBindGroups.push(
       //   ...state.compute.bindGroups(state.device, computePipeline)
       // );
-
       state.particleBindGroups = state.compute.bindGroups(state.device, computePipeline)
     }
 
