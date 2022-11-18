@@ -19,6 +19,7 @@ let makeCompute = (state: any) => {
     state.computeVertexBufferData.unmap();
   }
 
+
   if (state.compute.buffers) {
     state.particleBuffers = state.compute.buffers.map((userTypedArray: any) => {
       let buffer = device.createBuffer({
@@ -48,7 +49,7 @@ if (state.options.compute.simParams) {
 }
   //@ts-ignore
   if (state.compute.buffers) {
-    console.log(12313)
+    //console.log(12313)
   }
   
 };
@@ -167,6 +168,7 @@ function updateTexture(state: any) {
 function createRenderPasses(state: any) {
   if (!hasMadeCompute && state.compute) {
     makeCompute(state);
+
   }
 
   let {
@@ -200,8 +202,20 @@ function createRenderPasses(state: any) {
   state.renderPasses.push(mainRenderPass);
 }
 
+
 const recordRenderPass = async function (state: any) {
-  let { device, renderPassDescriptor } = state;
+  let { device } = state;
+
+  const renderPassDescriptor = {
+    colorAttachments: [
+      {
+        view: void 0,
+        clearValue: { r: 0.5, g: 0.5, b: 0.5, a: 1.0 },
+        loadOp: "clear",
+        storeOp: "store",
+      },
+    ],
+  };
 
   renderPassDescriptor.colorAttachments[0].view = state.context
     .getCurrentTexture()
@@ -220,23 +234,31 @@ const recordRenderPass = async function (state: any) {
 
     passEncoder.setPipeline(_.pipeline);
 
-
     passEncoder.setBindGroup(
       0,
       Array.isArray(_.bindGroup) ? _.bindGroup[t % 2] : _.bindGroup
     );
+
+      //bindGroupLayout
+      //bindGroup
+
+
     if (_.vertexBuffers)
       _.vertexBuffers.forEach(function (vertexBuffer: any, i: any) {
         passEncoder.setVertexBuffer(i, vertexBuffer);
     
       });
+
     if (_.numVertices) passEncoder.draw(3, _.numVertices, 0, 0);
     else !isCompute && _.type === passEncoder.draw(3 * 2, 1, 0, 0);
+
+
     if (_.dispatchWorkGroups) {
       if (Array.isArray(_.dispatchWorkGroups))
         passEncoder.dispatchWorkgroups(..._.dispatchWorkGroups);
       else passEncoder.dispatchWorkgroups(_.dispatchWorkGroups);
     }
+
     passEncoder.end();
   });
 
@@ -367,18 +389,7 @@ async function makePipeline(state: any) {
 
   state.bindGroupLayout = bindGroupLayout;
   updateUniforms(state);
-  const renderPassDescriptor = {
-    colorAttachments: [
-      {
-        view: void 0,
-        clearValue: { r: 0.5, g: 0.5, b: 0.5, a: 1.0 },
-        loadOp: "clear",
-        storeOp: "store",
-      },
-    ],
-  };
 
-  state.renderPassDescriptor = renderPassDescriptor;
 
   let pipeline = device.createRenderPipeline({
     ...pipelineDesc,
@@ -480,6 +491,7 @@ function makeShaderModule(state: any, source: any) {
   if (state.options.vs) {
     code = state.options.vs + state.options.shader
   }
+
   return device.createShaderModule({ code });
 }
 
@@ -492,7 +504,7 @@ function makeComputePass(state) {
         module: state.device.createShaderModule({
           code: state.compute.shader,
         }),
-        entryPoint: "main_vertex",
+        entryPoint: "main",
       },
     });
   if (state.compute.buffers) {
@@ -526,15 +538,17 @@ function makeComputePass(state) {
       });
     });
   }
-  
 
+    if (state.compute.bindGroups) {
+      // console.log(state.compute.bindGroups(device, computePipeline))
+      // state.particleBindGroups.push(
+      //   ...state.compute.bindGroups(state.device, computePipeline)
+      // );
 
-    if (state.computeBindGroups?.length) {
-      state.particleBindGroups.push(
-        ...state.compute.bindGroups(state.device, computePipeline)
-      );
+      state.particleBindGroups = state.compute.bindGroups(state.device, computePipeline)
     }
-  
+
+
 
     return {
       pipeline: computePipeline,

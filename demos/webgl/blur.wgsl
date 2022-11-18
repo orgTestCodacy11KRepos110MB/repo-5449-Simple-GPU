@@ -12,7 +12,6 @@ struct Flip {
   value : u32,
 }
 @group(1) @binding(3) var<uniform> flip : Flip;
-
 // This shader blurs the input texture in one direction, depending on whether
 // |flip.value| is 0 or 1.
 // It does so by running (128 / 4) threads per workgroup to load 128
@@ -26,9 +25,7 @@ struct Flip {
 // Specifically, with 128 x 128 tiles, we can only compute and write out
 // square blocks of size 128 - (filterSize - 1). We compute the number of blocks
 // needed in Javascript and dispatch that amount.
-
 var<workgroup> tile : array<array<vec3<f32>, 128>, 4>;
-
 @compute @workgroup_size(32, 1, 1)
 fn main(
   @builtin(workgroup_id) WorkGroupID : vec3<u32>,

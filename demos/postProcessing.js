@@ -5,13 +5,23 @@ import blur from './webgl/blur.wgsl?raw'
 const tileDim = 128;
 const batch = [4, 4];
 const blockDim = 15
-
+const [srcWidth, srcHeight] = [500, 500];
 const options = {
   data: {},
   texture: '../data.png',
   compute: {
     shader: blur,
-    bindGroups: (device) => {
+    bindGroups: (device, blurPipeline) => {
+      let texture = device.createTexture({
+        size: [900, 900, 1],
+        format: "rgba8unorm",
+        usage:
+          GPUTextureUsage.TEXTURE_BINDING |
+          GPUTextureUsage.COPY_DST |
+          GPUTextureUsage.RENDER_ATTACHMENT,
+      });
+
+
       const buffer0 = (() => {
         const buffer = device.createBuffer({
           size: 4,
@@ -53,7 +63,7 @@ const options = {
         entries: [
           {
             binding: 1,
-            resource: cubeTexture.createView(),
+            resource: texture.createView(),
           },
           {
             binding: 2,
