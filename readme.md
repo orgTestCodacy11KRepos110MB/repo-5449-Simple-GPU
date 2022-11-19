@@ -4,6 +4,9 @@ simplest GPGPU compute library ever
 transpiler, shadergraph, ui for that, 
 
 
+
+for book of shaders for kids and researchers to learn more about science, simulation, parallel query processing and more tbc;
+
 [{ binding: 0, visibility: ShaderStage::Compute,
  buffer: { type: BufferBindingType::Uniform, 
  hasDynamicOffset: 0, minBindingSize: 28 } }, 
