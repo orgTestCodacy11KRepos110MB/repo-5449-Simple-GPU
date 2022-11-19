@@ -121,6 +121,8 @@ fn main_fragment(
   col.x = .3;
   col.y = .6;
   col.z = .3;
+  var cubemapVec = fragPosition.xy;
+
   return  vec4<f32>(col, 1.0);
 
 }

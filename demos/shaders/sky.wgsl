@@ -63,7 +63,6 @@ fn main_fragment(
   @location(0) fragUV: vec2<f32>,
     @location(1) fragPosition: vec4<f32>
 ) -> @location(0) vec4<f32> {
-    //return vec2<f32>();
     var p = fragUV;
     var i = 0;
     

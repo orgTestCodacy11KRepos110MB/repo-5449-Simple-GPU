@@ -4,7 +4,6 @@ import utils from "./utils";
 import defaultShader from "./default.wgsl?raw";
 
 
-
 let makeCompute = (state: any) => {
   let { device } = state;
 

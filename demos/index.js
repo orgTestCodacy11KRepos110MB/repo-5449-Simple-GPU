@@ -34,7 +34,6 @@ import sunThing from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/sun-thi
 import { image } from "d3";
 
 
-
 //import webgazer from 'webgazer'
 
 // var prediction = webgazer.getCurrentPrediction();
@@ -58,7 +57,7 @@ import { image } from "d3";
 //     var y = prediction.y;
 // }
 
-let defaultDemo = 'kaleidoscope';
+let defaultDemo = 'physics';
 let data = {}
 
 async function start_loop_static(options) {

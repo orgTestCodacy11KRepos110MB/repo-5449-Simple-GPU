@@ -1,12 +1,12 @@
-fn sphIntersect(ro:vec3<f32>, rd:vec3<f32>, sph:vec4<f32>) -> f32 {
-  var oc = ro - sph.xyz;
-  var b = dot(oc, rd);
-  var c = dot(oc, oc) - sph.w * sph.w;
-  var h = b*b -c;
-  if ( h < 0.0 ) { return - 1.0; }
-  h = sqrt(h);
-  return -b - h;
-}
+// fn sphIntersect(ro:vec3<f32>, rd:vec3<f32>, sph:vec4<f32>) -> f32 {
+//   var oc = ro - sph.xyz;
+//   var b = dot(oc, rd);
+//   var c = dot(oc, oc) - sph.w * sph.w;
+//   var h = b*b -c;
+//   if ( h < 0.0 ) { return - 1.0; }
+//   h = sqrt(h);
+//   return -b - h;
+// }
 
 // fn sphere(ro: vec3<f32>, rd: vec3<f32>){
 //         var b = dot(ro, rd);
@@ -15,47 +15,47 @@ fn sphIntersect(ro:vec3<f32>, rd:vec3<f32>, sph:vec4<f32>) -> f32 {
 //         return h<0.0 ? -1.0 : -b - sqrt(h);
 // }
 
-fn xrot(angle:f32) -> mat3x3<f32> {
-    var m = mat3x3<f32>
-    ( 1.6, 0.0, 0.0,
-      0.0, cos(angle), -sin(angle),
-      0.0, sin(angle), cos(angle)
-    );
-    // var m[0] = vec3<f32>(1.0, 0.0, 0.0);
-    // var m[1] = vec3<f32>(0.0, cos(angle), -sin(angle));
-    // var m[2] = vec3<f32>(0.0, sin(angle), cos(angle));
-    return m;
-}
+// fn xrot(angle:f32) -> mat3x3<f32> {
+//     var m = mat3x3<f32>
+//     ( 1.6, 0.0, 0.0,
+//       0.0, cos(angle), -sin(angle),
+//       0.0, sin(angle), cos(angle)
+//     );
+//     // var m[0] = vec3<f32>(1.0, 0.0, 0.0);
+//     // var m[1] = vec3<f32>(0.0, cos(angle), -sin(angle));
+//     // var m[2] = vec3<f32>(0.0, sin(angle), cos(angle));
+//     return m;
+// }
 
-fn yrot(angle: f32) -> mat3x3<f32> {
-    var m = mat3x3<f32>(cos(angle), 0.0, 0.0,
-      0.0, cos(angle), -sin(angle),
-      0.0, sin(angle), cos(angle)
-    );
-    // var m[0] = vec3<f32>(1.0, 0.0, 0.0);
-    // var m[1] = vec3<f32>(0.0, cos(angle), -sin(angle));
-    // var m[2] = vec3<f32>(0.0, sin(angle), cos(angle));
-    return m;
-}
+// fn yrot(angle: f32) -> mat3x3<f32> {
+//     var m = mat3x3<f32>(cos(angle), 0.0, 0.0,
+//       0.0, cos(angle), -sin(angle),
+//       0.0, sin(angle), cos(angle)
+//     );
+//     // var m[0] = vec3<f32>(1.0, 0.0, 0.0);
+//     // var m[1] = vec3<f32>(0.0, cos(angle), -sin(angle));
+//     // var m[2] = vec3<f32>(0.0, sin(angle), cos(angle));
+//     return m;
+// }
 
 // fn render (uv: vec2<f32>, time: f32,) -> vec4<f32> {
 // }
 
-fn intersectSphere(camera: vec3<f32>, ray:vec3<f32>, sphereOrigin:vec3<f32>, sphereRadius:f32) -> f32 {
-    var radiusSquared = sphereRadius * sphereRadius;
-    var dt = dot(ray, sphereOrigin - camera);
-    if (dt < 0.0) {
-        return -1.0;
-    }
-    var tmp = camera - sphereOrigin;
-    tmp.x = dot(tmp, tmp);
-    tmp.x = tmp.x - dt * dt;
-    if (tmp.x > radiusSquared) {
-        return -1.0;
-    }
-    var distanceFromCamera = dt - sqrt(radiusSquared - tmp.x);
-    return distanceFromCamera;
-}
+// fn intersectSphere(camera: vec3<f32>, ray:vec3<f32>, sphereOrigin:vec3<f32>, sphereRadius:f32) -> f32 {
+//     var radiusSquared = sphereRadius * sphereRadius;
+//     var dt = dot(ray, sphereOrigin - camera);
+//     if (dt < 0.0) {
+//         return -1.0;
+//     }
+//     var tmp = camera - sphereOrigin;
+//     tmp.x = dot(tmp, tmp);
+//     tmp.x = tmp.x - dt * dt;
+//     if (tmp.x > radiusSquared) {
+//         return -1.0;
+//     }
+//     var distanceFromCamera = dt - sqrt(radiusSquared - tmp.x);
+//     return distanceFromCamera;
+// }
 
 // @fragment
 //   fn main_fragment(
@@ -129,6 +129,9 @@ fn intersectSphere(camera: vec3<f32>, ray:vec3<f32>, sphereOrigin:vec3<f32>, sph
      @location(0) fragUV: vec2<f32>,
      @location(1) fragPosition: vec4<f32>
   ) ->  @location(0) vec4<f32> {
-    var col = .55;    
+    var col = .55;   
+
+    
+
     return vec4<f32>(col, col, col, 1.);
   }
