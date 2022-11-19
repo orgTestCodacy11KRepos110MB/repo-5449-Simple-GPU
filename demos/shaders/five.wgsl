@@ -1,53 +1,134 @@
+fn sphIntersect(ro:vec3<f32>, rd:vec3<f32>, sph:vec4<f32>) -> f32 {
+  var oc = ro - sph.xyz;
+  var b = dot(oc, rd);
+  var c = dot(oc, oc) - sph.w * sph.w;
+  var h = b*b -c;
+  if ( h < 0.0 ) { return - 1.0; }
+  h = sqrt(h);
+  return -b - h;
+}
+
+// fn sphere(ro: vec3<f32>, rd: vec3<f32>){
+//         var b = dot(ro, rd);
+//         var c = dot(ro,ro)-1.0;
+//         var h = b * b -c;
+//         return h<0.0 ? -1.0 : -b - sqrt(h);
+// }
+
+fn xrot(angle:f32) -> mat3x3<f32> {
+    var m = mat3x3<f32>
+    ( 1.6, 0.0, 0.0,
+      0.0, cos(angle), -sin(angle),
+      0.0, sin(angle), cos(angle)
+    );
+    // var m[0] = vec3<f32>(1.0, 0.0, 0.0);
+    // var m[1] = vec3<f32>(0.0, cos(angle), -sin(angle));
+    // var m[2] = vec3<f32>(0.0, sin(angle), cos(angle));
+    return m;
+}
+
+fn yrot(angle: f32) -> mat3x3<f32> {
+    var m = mat3x3<f32>(cos(angle), 0.0, 0.0,
+      0.0, cos(angle), -sin(angle),
+      0.0, sin(angle), cos(angle)
+    );
+    // var m[0] = vec3<f32>(1.0, 0.0, 0.0);
+    // var m[1] = vec3<f32>(0.0, cos(angle), -sin(angle));
+    // var m[2] = vec3<f32>(0.0, sin(angle), cos(angle));
+    return m;
+}
+
+// fn render (uv: vec2<f32>, time: f32,) -> vec4<f32> {
+// }
+
+fn intersectSphere(camera: vec3<f32>, ray:vec3<f32>, sphereOrigin:vec3<f32>, sphereRadius:f32) -> f32 {
+    var radiusSquared = sphereRadius * sphereRadius;
+    var dt = dot(ray, sphereOrigin - camera);
+    if (dt < 0.0) {
+        return -1.0;
+    }
+    var tmp = camera - sphereOrigin;
+    tmp.x = dot(tmp, tmp);
+    tmp.x = tmp.x - dt * dt;
+    if (tmp.x > radiusSquared) {
+        return -1.0;
+    }
+    var distanceFromCamera = dt - sqrt(radiusSquared - tmp.x);
+    return distanceFromCamera;
+}
+
 // @fragment
+//   fn main_fragment(
+//     @location(0) fragUV: vec2<f32>,
+//     @location(1) fragPosition: vec4<f32>
+//   ) -> @location(0) vec4<f32> {
+//     var col = .1;    
+//     var ssaa = 4;
+//     var c = vec3<f32>(0.0);
+//     var m = 0;
+//     loop {
+//         if (m > ssaa) {break;}
+//             col += .1;
+//         m++;
+//     }
+//     var cubemapVec2 = fragPosition.xy;
+                   
+//     // let color = render(fragUV, u.time);
+//         var lightPosition = vec3<f32>(0.0, 0.0, -25.0);
+//     var spherePosition = vec3<f32>(0.0, 0.0, 0.0);
+//     var cameraPosition = vec3<f32>(0.0, 0.0, 0.0);
+//     var sphereRadius = 1.4;
+
+
+//     var fuv = fragUV * 2.0;
+//     fuv.y -= 1.0;
+//     fuv.x -= (1.0 / (u.width));
+
+//     var pixelPosition = vec3<f32>(fuv.x / 5.0, fuv.y / 5.0, 1.0);
+
+//     var ray = pixelPosition - cameraPosition;
+//     ray = normalize(ray);
+
+//     ray = ray * xrot(u.time * .3) * yrot(u.time * .3);
+//     cameraPosition = cameraPosition * xrot(u.time * .3);
+
+//     lightPosition = cameraPosition;
+
+//     var distance = intersectSphere(cameraPosition, ray, spherePosition, sphereRadius);
+
+//     if (distance > 0.0) {
+//         var pointOfIntersection = cameraPosition +ray * distance;
+//         var normal = normalize(pointOfIntersection - spherePosition);
+
+//         var u = 0.5 + atan2(normal.z, normal.x) / (3.1415926 * 2.0);
+//         var v = 0.5 - sin(normal.y) / -3.1415926;
+
+//         var brightness = dot(normalize(lightPosition - spherePosition), normal);
+//         if (brightness < 0.0) {
+//             brightness = 0.0;
+//         }
+//         var cubemapVec2 = fuv.xy;
+//         var time = sin(vec2<f32>(u.time, u.time) * .0001);
+
+//         var outputColor = textureSample(myTexture, mySampler, cubemapVec2);
+//         var x = u * 18.0;
+//         var y = v * 10.0;
+//         if (fract(x) < .1 || fract(y) < .1) {
+//             outputColor *= 0.5;
+//         }
+//         return outputColor * brightness;
+//     } else {
+//         return vec4<f32>(0., 0., 0., 1.);
+//     }
+
+//     return vec4<f32>(col, col, col, 1.);
+// }
+
 @fragment
   fn main_fragment(
-    @location(0) fragUV: vec2<f32>,
-    7@location(1) fragPosition: vec4<f32>
-  ) -> @location(0) vec4<f32> {    
-    var color = .7;
-
-    var uv = fragUV / vec2(u.width,u.height) - .5;
-    var t = u.time * .1 + ((.25 + .05 * sin(u.time * .1)))
-    / length(uv.xy) * 2.2;
-	var si = sin(t);
-    var co = cos(t);
-    var ma = mat2x2<f32>(co, si, -si, co);
-
-    var v1 = 0.0; 
-    var v2 = 0.0; 
-    var v3 = 0.0;
-
-    var s = 0.0;
-    var i = 0;
-    loop {
-        if i < 90 {break;}
-
-        var p = s * vec3(uv, 0.0);
-       // p.xy *= ma;
-        p += vec3(.22, .3, s - 1.5 - sin(u.time * .13) * .1);
-        v1 += dot(p,p) * .0015 * (1.8 + sin(length(uv.xy)));
-        v2 += dot(p,p) * .0015 * (1.8 + sin(length(uv.xy)));
-        v3 += dot(p,p) * .0015 * (1.8 + sin(length(uv.xy)));
-        s += .035;
-    }
-
-    var len = length(uv);
-	v1 *= smoothstep(.7, .0, len);
-	v2 *= smoothstep(.5, .0, len);
-	v3 *= smoothstep(.9, .0, len);
-	
-	var col = vec3( v3 * (1.5 + sin(u.time * .2) * .4),
-					(v1 + v3) * .3, v2)
-                     +      
-                    smoothstep(0.2, .0, len) *          
-              .85 + smoothstep(.0, .6, v3) * .3;
-
-
-    var mn = pow(abs(col), vec3(1.2));
-    mn.x = 1;
-    mn.y = 1;
-
-    mn.y = 1;
-    
-    return vec4<f32>(col, 1.);
-}
+     @location(0) fragUV: vec2<f32>,
+     @location(1) fragPosition: vec4<f32>
+  ) ->  @location(0) vec4<f32> {
+    var col = .55;    
+    return vec4<f32>(col, col, col, 1.);
+  }
