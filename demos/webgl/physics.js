@@ -30,6 +30,77 @@ const options = {
   vs: spriteWGSLVS, // 
   shader: spriteWGSLFS, //
   compute: {
+    bindGroups: (device, computePipeline, options, state) => {
+      const simParamBufferSize = 7 * Float32Array.BYTES_PER_ELEMENT;
+
+      let simParamBuffer = device.createBuffer({
+        size: simParamBufferSize,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      });
+
+      const simParams = options.compute.simParams;
+      device.queue.writeBuffer(
+        simParamBuffer,
+        0,
+        new Float32Array(Object.values(simParams))
+      );
+
+      let particleBuffers = options.compute.buffers.map((userTypedArray) => {
+        let buffer = device.createBuffer({
+          size: userTypedArray.byteLength,
+          usage: GPUBufferUsage.VERTEX | GPUBufferUsage.STORAGE,
+          mappedAtCreation: true,
+        });
+  
+        new Float32Array(buffer.getMappedRange()).set(userTypedArray);
+        buffer.unmap();
+        return buffer;
+      });
+      state.particleBuffers = particleBuffers
+      console.log(particleBuffers);
+
+
+      return options.compute.buffers.map(function (d, i) {
+        return device.createBindGroup({
+          layout: computePipeline.getBindGroupLayout(0),
+          entries: [
+            {
+              binding: 0,
+              resource: {
+                buffer: simParamBuffer, //particlePos //rename to make generic
+              },
+            },
+            {
+              binding: 1,
+              resource: {
+                buffer: particleBuffers[i], //paricleVel //rename to make generic
+                offset: 0,
+                size: initialParticleData.byteLength,
+              },
+            },
+            {
+              binding: 2,
+              resource: {
+                buffer: particleBuffers[(i + 1) % 2], //a_pos
+                offset: 0,
+                size: initialParticleData.byteLength,
+              },
+            },
+          ],
+        });
+      });
+
+
+
+
+
+
+
+
+
+
+
+    },
     //optional
     dispatchWorkGroups: () => {
       return Math.ceil(initialParticleData.length / 64)

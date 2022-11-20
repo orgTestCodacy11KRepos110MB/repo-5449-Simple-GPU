@@ -139,7 +139,6 @@ function updateTexture(state: any) {
 function createRenderPasses(state: any) {
   if (!hasMadeCompute && state.compute) {
     makeCompute(state);
-
   }
 
   let {
@@ -149,7 +148,7 @@ function createRenderPasses(state: any) {
   } = state;
 
   const bindGroup = device.createBindGroup(state.bindGroupDescriptor);
-
+//TODO: parameterize bindGroup here
   const mainRenderPass = {
     renderPassDescriptor: state.renderPassDescriptor,
     texture: state.texture,
@@ -158,17 +157,19 @@ function createRenderPasses(state: any) {
     type: "draw",
   };
 
+  console.log(123, particleBuffers)
   //@ts-ignore
   if (state?.compute?.numVertices)
     //@ts-ignore
     mainRenderPass.numVertices = state.compute.numVertices();
   //@ts-ignore
-  if (state.compute && particleBuffers)
+  if (state.compute )
     //@ts-ignore
     mainRenderPass.vertexBuffers = [
       particleBuffers[0],
       computeVertexBufferData,
     ];
+    //console.log(particleBuffers)
 
   state.renderPasses.push(mainRenderPass);
 }
@@ -204,18 +205,19 @@ const recordRenderPass = async function (state: any) {
     if (_.texture) updateTexture(state);
 
     passEncoder.setPipeline(_.pipeline);
+    
+    // _.bindGroups.forEach((bindGroup, i) => {
+    // });
 
-    passEncoder.setBindGroup(
-      0,
-      Array.isArray(_.bindGroup) ? _.bindGroup[t % 2] : _.bindGroup
-    );
-
-      //bindGroupLayout
-      //bindGroup
+    passEncoder.setBindGroup(0,
+ 
+       Array.isArray(_.bindGroup) ? _.bindGroup[t % 2] : _.bindGroup
+       );
+//    passEncoder.setBindGroup(1, _.bindGroup[1]);
+      //console.log(_.vertexBuffers)
     if (_.vertexBuffers)
       _.vertexBuffers.forEach(function (vertexBuffer: any, i: any) {
         passEncoder.setVertexBuffer(i, vertexBuffer);
-    
       });
 
     if (_.numVertices) passEncoder.draw(3, _.numVertices, 0, 0);
@@ -479,87 +481,11 @@ function makeComputePass(state) {
         entryPoint: "main",
       },
     });
-    
-
-    if (state.compute.buffers) {
-      state.particleBuffers = state.compute.buffers.map((userTypedArray: any) => {
-        let buffer = device.createBuffer({
-          size: userTypedArray.byteLength,
-          usage: GPUBufferUsage.VERTEX | GPUBufferUsage.STORAGE,
-          mappedAtCreation: true,
-        });
-  
-        new Float32Array(buffer.getMappedRange()).set(userTypedArray);
-        buffer.unmap();
-        return buffer;
-      });
-    }
-
-    const simParamBufferSize = 7 * Float32Array.BYTES_PER_ELEMENT;
-  state.simParamBuffer = device.createBuffer({
-    size: simParamBufferSize,
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-  });
-  
-if (state.options.compute.simParams) {
-  const simParams = state.options.compute.simParams;
-  device.queue.writeBuffer(
-    state.simParamBuffer,
-    0,
-    new Float32Array(Object.values(simParams))
-  );
-}
-
-    // console.log(
-    //   state.particleBuffers, 
-    //   state.compute.buffers[1].byteLength,
-    //   state.simParamBuffer,
-      
-    //   );
-
-
-
-  if (state.compute.buffers) {
-    state.particleBindGroups = state.compute.buffers.map(function (d:any, i:any) {
-      return device.createBindGroup({
-        layout: computePipeline.getBindGroupLayout(0),
-        entries: [
-          {
-            binding: 0,
-            resource: {
-              buffer: state.simParamBuffer, //particlePos //rename to make generic
-            },
-          },
-          {
-            binding: 1,
-            resource: {
-              buffer: state.particleBuffers[i], //paricleVel //rename to make generic
-              offset: 0,
-              size: state.compute.buffers[0].byteLength,
-            },
-          },
-          {
-            binding: 2,
-            resource: {
-              buffer: state.particleBuffers[(i + 1) % 2], //a_pos
-              offset: 0,
-              size: state.compute.buffers[1].byteLength,
-            },
-          },
-        ],
-      });
-    });
-  }
 
     if (state.compute.bindGroups) {
-      // console.log(state.compute.bindGroups(device, computePipeline))
-      // state.particleBindGroups.push(
-      //   ...state.compute.bindGroups(state.device, computePipeline)
-      // );
-      state.particleBindGroups = state.compute.bindGroups(state.device, computePipeline)
+      state.particleBindGroups = state.compute.bindGroups(state.device, computePipeline,
+        state.options, state)
     }
-
-
 
     return {
       pipeline: computePipeline,
