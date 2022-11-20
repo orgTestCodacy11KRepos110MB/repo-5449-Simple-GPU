@@ -20,7 +20,7 @@ struct Particles {
 
 // https://github.com/austinEng/Project6-Vulkan-Flocking/blob/master/data/shaders/computeparticles/particle.comp
 @compute @workgroup_size(64)
-fn main_vertex(@builtin(global_invocation_id) GlobalInvocationID : vec3<u32>) {
+fn main(@builtin(global_invocation_id) GlobalInvocationID : vec3<u32>) {
   var index = GlobalInvocationID.x;
 
   var vPos = particlesA.particles[index].pos;

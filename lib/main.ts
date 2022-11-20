@@ -3,7 +3,6 @@ import utils from "./utils";
 // @ts-ignore
 import defaultShader from "./default.wgsl?raw";
 
-
 let makeCompute = (state: any) => {
   let { device } = state;
 
@@ -19,35 +18,6 @@ let makeCompute = (state: any) => {
     );
     state.computeVertexBufferData.unmap();
   }
-
-
-  if (state.compute.buffers) {
-    state.particleBuffers = state.compute.buffers.map((userTypedArray: any) => {
-      let buffer = device.createBuffer({
-        size: userTypedArray.byteLength,
-        usage: GPUBufferUsage.VERTEX | GPUBufferUsage.STORAGE,
-        mappedAtCreation: true,
-      });
-
-      new Float32Array(buffer.getMappedRange()).set(userTypedArray);
-      buffer.unmap();
-      return buffer;
-    });
-  }
-  const simParamBufferSize = 7 * Float32Array.BYTES_PER_ELEMENT;
-  state.simParamBuffer = device.createBuffer({
-    size: simParamBufferSize,
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-  });
-  
-if (state.options.compute.simParams) {
-  const simParams = state.options.compute.simParams;
-  device.queue.writeBuffer(
-    state.simParamBuffer,
-    0,
-    new Float32Array(Object.values(simParams))
-  );
-}
   //@ts-ignore
   if (state.compute.buffers) {
     //console.log(12313)
@@ -496,7 +466,7 @@ function makeShaderModule(state: any, source: any) {
 
   return device.createShaderModule({ code });
 }
-
+//pikachu physics / carebear
 function makeComputePass(state) {
   let device = state.device;
   let shader = makeShaderModule(state, state.compute.cs);
@@ -509,6 +479,44 @@ function makeComputePass(state) {
         entryPoint: "main",
       },
     });
+    
+
+    if (state.compute.buffers) {
+      state.particleBuffers = state.compute.buffers.map((userTypedArray: any) => {
+        let buffer = device.createBuffer({
+          size: userTypedArray.byteLength,
+          usage: GPUBufferUsage.VERTEX | GPUBufferUsage.STORAGE,
+          mappedAtCreation: true,
+        });
+  
+        new Float32Array(buffer.getMappedRange()).set(userTypedArray);
+        buffer.unmap();
+        return buffer;
+      });
+    }
+
+    const simParamBufferSize = 7 * Float32Array.BYTES_PER_ELEMENT;
+  state.simParamBuffer = device.createBuffer({
+    size: simParamBufferSize,
+    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+  });
+  
+if (state.options.compute.simParams) {
+  const simParams = state.options.compute.simParams;
+  device.queue.writeBuffer(
+    state.simParamBuffer,
+    0,
+    new Float32Array(Object.values(simParams))
+  );
+}
+
+    // console.log(
+    //   state.particleBuffers, 
+    //   state.compute.buffers[1].byteLength,
+    //   state.simParamBuffer,
+      
+    //   );
+
 
 
   if (state.compute.buffers) {
