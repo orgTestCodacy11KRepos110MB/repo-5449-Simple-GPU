@@ -363,7 +363,7 @@ async function makePipeline(state: any) {
   });
 
   let texture = await makeTexture(state);
-  state.xDescriptor = {
+  state.bindGroupDescriptor = {
     layout: pipeline.getBindGroupLayout(0),
     entries: [
       {
@@ -389,7 +389,6 @@ async function makePipeline(state: any) {
       },
     ],
   };
-
 
   state.bindGroupDescriptor.entries[0].resource.buffer = updateUniforms(state);
 
