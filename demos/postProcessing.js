@@ -62,15 +62,15 @@ const options = {
         layout: blurPipeline.getBindGroupLayout(1),
         entries: [
           {
-            binding: 1,
+            binding: 0,
             resource: texture.createView(),
           },
           {
-            binding: 2,
+            binding: 1,
             resource: textures[0].createView(),
           },
           {
-            binding: 3,
+            binding: 2,
             resource: {
               buffer: buffer0,
             },
@@ -119,7 +119,9 @@ const options = {
       });
 
       return [
-        computeBindGroup0,computeBindGroup1, computeBindGroup2
+        computeBindGroup0,
+         computeBindGroup1, 
+         computeBindGroup2
       ]
     },
     dispatchWorkGroups: () => {

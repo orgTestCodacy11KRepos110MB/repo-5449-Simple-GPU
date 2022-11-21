@@ -20,9 +20,8 @@ let makeCompute = (state: any) => {
   }
   //@ts-ignore
   if (state.compute.buffers) {
-    //console.log(12313)
+
   }
-  
 };
 
 let hasMadeCompute = false;
@@ -34,7 +33,8 @@ let makeImgTexture = async (state: any) => {
 
   img.src = state.data.texture;
 
-  await img.decode();
+  await 
+  img.decode();
 
   return await createImageBitmap(img);
 };
@@ -157,19 +157,17 @@ function createRenderPasses(state: any) {
     type: "draw",
   };
 
-  console.log(123, particleBuffers)
   //@ts-ignore
   if (state?.compute?.numVertices)
     //@ts-ignore
     mainRenderPass.numVertices = state.compute.numVertices();
   //@ts-ignore
-  if (state.compute )
+  if (state.compute && particleBuffers)
     //@ts-ignore
     mainRenderPass.vertexBuffers = [
       particleBuffers[0],
       computeVertexBufferData,
     ];
-    //console.log(particleBuffers)
 
   state.renderPasses.push(mainRenderPass);
 }
@@ -205,16 +203,11 @@ const recordRenderPass = async function (state: any) {
     if (_.texture) updateTexture(state);
 
     passEncoder.setPipeline(_.pipeline);
-    
-    // _.bindGroups.forEach((bindGroup, i) => {
-    // });
 
     passEncoder.setBindGroup(0,
- 
        Array.isArray(_.bindGroup) ? _.bindGroup[t % 2] : _.bindGroup
        );
-//    passEncoder.setBindGroup(1, _.bindGroup[1]);
-      //console.log(_.vertexBuffers)
+ 
     if (_.vertexBuffers)
       _.vertexBuffers.forEach(function (vertexBuffer: any, i: any) {
         passEncoder.setVertexBuffer(i, vertexBuffer);
@@ -370,7 +363,7 @@ async function makePipeline(state: any) {
   });
 
   let texture = await makeTexture(state);
-  state.bindGroupDescriptor = {
+  state.xDescriptor = {
     layout: pipeline.getBindGroupLayout(0),
     entries: [
       {
