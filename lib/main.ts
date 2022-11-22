@@ -3,6 +3,54 @@ import utils from "./utils";
 // @ts-ignore
 import defaultShader from "./default.wgsl?raw";
 
+async function init(options: any) {
+  let canvas = options.canvas || utils.createCanvas();
+  const state = {
+    renderPassDescriptor: {},
+    options,
+    data: Object.assign(defaultData, options.data), //user data
+    compute: options.compute, //user data
+    renderPasses: [], //internal state
+  };
+
+  utils.addMouseEvents(canvas, state.data);
+
+  const context = canvas.getContext("webgpu") as GPUCanvasContext;
+  const adapter = (await navigator.gpu.requestAdapter()) as GPUAdapter;
+  const device = (await adapter?.requestDevice()) as GPUDevice;
+  const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+
+  Object.assign(state, {
+    device,
+    context,
+    adapter,
+  });
+
+  context.configure({
+    device,
+    format: presentationFormat,
+    alphaMode: "opaque",
+    usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
+  });
+
+  //@ts-ignore
+  function draw(newData: any) {
+    newData.time = performance.now();
+
+    utils.updateTexture(state);
+    Object.assign(state.data, newData);
+    updateUniforms(state);
+    recordRenderPass(state);
+
+    return draw;
+  }
+
+  draw.canvas = canvas;
+
+  compile(state, options);
+  return draw;
+}
+
 let makeCompute = (state: any) => {
   let { device } = state;
 
@@ -19,123 +67,13 @@ let makeCompute = (state: any) => {
     state.computeVertexBufferData.unmap();
   }
   //@ts-ignore
-  if (state.compute.buffers) {
-
-  }
+  if (state.compute.buffers) {  }
 };
 
 let hasMadeCompute = false;
-let makeImgTexture = async (state: any) => {
-  const img = document.createElement("img");
-  const source = img;
-  source.width = innerWidth;
-  source.height = innerHeight;
 
-  img.src = state.data.texture;
 
-  await 
-  img.decode();
-
-  return await createImageBitmap(img);
-};
-
-async function makeTexture(state: any) {
-
-  if (HTMLImageElement === state?.data?.texture?.constructor) {
-    let img = state.data.texture;
-    await img.decode();
-    await createImageBitmap(img);
-    await img.decode();
-    let imageBitmap =  await createImageBitmap(img); 
-
-    let texture = state.device.createTexture({
-      size: [imageBitmap.width, imageBitmap.height, 1],
-      format: "rgba8unorm",
-      usage:
-        GPUTextureUsage.TEXTURE_BINDING |
-        GPUTextureUsage.COPY_DST |
-        GPUTextureUsage.RENDER_ATTACHMENT,
-    });
-    state.device.queue.copyExternalImageToTexture(
-      { source: imageBitmap },
-      { texture: texture },
-      [imageBitmap.width, imageBitmap.height]
-    );
-    state.texture = texture;
-    updateTexture(state);
-    return texture;
-  } else if ("string" === typeof state.data.texture) {
-    let texture = state.device.createTexture({
-      size: [900, 500, 1],
-      format: "rgba8unorm",
-      usage:
-        GPUTextureUsage.TEXTURE_BINDING |
-        GPUTextureUsage.COPY_DST |
-        GPUTextureUsage.RENDER_ATTACHMENT,
-    });
-
-    let imageBitmap = await makeImgTexture(state);
-
-    state.device.queue.copyExternalImageToTexture(
-      { source: imageBitmap },
-      { texture: texture },
-      [imageBitmap.width, imageBitmap.height]
-    );
-    state.texture = texture;
-    updateTexture(state);
-    return texture;
-  } else {
-    let texture = state.device.createTexture({
-      size: [256, 1, 1],
-      format: "rgba8unorm",
-      usage:
-        GPUTextureUsage.TEXTURE_BINDING |
-        GPUTextureUsage.COPY_DST |
-        GPUTextureUsage.RENDER_ATTACHMENT,
-    });
-    let music = new Float32Array(
-      new Array(800)
-        .fill(5)
-        .map((d: any, i) =>
-          state.data.texture
-            ? state.data.texture[(i % state.data.texture.length) + d]
-            : Math.random()
-        )
-    );
-
-    state.texture = texture
-    state.data.music = music;
-    updateTexture(state);
-
-    return texture;
-  }
-}
 let t = 0;
-
-function updateTexture(state: any) {
-  if (! state.texture) return 
-  if ((state.data.texture)) {
-  let data = new Uint8Array(
-    //@ts-ignore
-    new Array(1024).fill(5).map((d, i) => {
-      return state.data.texture
-        ? state.data.texture[i % state.data.texture.length]
-        : Math.random();
-    })
-  );
-
-  state.device.queue.writeTexture(
-    { texture: state.texture },
-    data.buffer,
-    {
-      bytesPerRow: 3200,
-      rowsPerImage: 600,
-    },
-    [256, 1]
-  );
-  }
-}
-
 function createRenderPasses(state: any) {
   if (!hasMadeCompute && state.compute) {
     makeCompute(state);
@@ -200,19 +138,17 @@ const recordRenderPass = async function (state: any) {
       ? commandEncoder.beginComputePass()
       : commandEncoder.beginRenderPass(renderPassDescriptor);
 
-    if (_.texture) updateTexture(state);
+    if (_.texture) utils.updateTexture(state);
 
     passEncoder.setPipeline(_.pipeline);
-
     // passEncoder.setBindGroup(0,
     //    Array.isArray(_.bindGroup) ? _.bindGroup[t % 2] : _.bindGroup
     //    );
 if (Array.isArray(_.bindGroup)) {
   _.bindGroup.forEach(function (bindGroup, i) {
-//console.log(bindGroup, i )
     passEncoder.setBindGroup(i,
         bindGroup
-         );
+    );
   })
 } else {
       passEncoder.setBindGroup(0,
@@ -375,7 +311,7 @@ async function makePipeline(state: any) {
     layout: pipelineLayout,
   });
 
-  let texture = await makeTexture(state);
+  let texture = await utils.makeTexture(state);
   state.bindGroupDescriptor = {
     layout: pipeline.getBindGroupLayout(0),
     entries: [
@@ -524,54 +460,6 @@ let defaultData = {
   mouseY: 0,
   angle: 0,
 };
-
-async function init(options: any) {
-  let canvas = options.canvas || utils.createCanvas();
-  const state = {
-    renderPassDescriptor: {},
-    options,
-    data: Object.assign(defaultData, options.data), //user data
-    compute: options.compute, //user data
-    renderPasses: [], //internal state
-  };
-
-  utils.addMouseEvents(canvas, state.data);
-
-  const context = canvas.getContext("webgpu") as GPUCanvasContext;
-  const adapter = (await navigator.gpu.requestAdapter()) as GPUAdapter;
-  const device = (await adapter?.requestDevice()) as GPUDevice;
-  const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
-
-  Object.assign(state, {
-    device,
-    context,
-    adapter,
-  });
-
-  context.configure({
-    device,
-    format: presentationFormat,
-    alphaMode: "opaque",
-    usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
-  });
-
-  //@ts-ignore
-  function draw(newData: any) {
-    newData.time = performance.now();
-
-    updateTexture(state);
-    Object.assign(state.data, newData);
-    updateUniforms(state);
-    recordRenderPass(state);
-
-    return draw;
-  }
-
-  draw.canvas = canvas;
-
-  compile(state, options);
-  return draw;
-}
 
 init.version = "0.9.16";
 

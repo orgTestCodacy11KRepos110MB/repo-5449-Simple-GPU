@@ -1,3 +1,104 @@
+function updateTexture(state: any) {
+  if (! state.texture) return 
+  if ((state.data.texture)) {
+  let data = new Uint8Array(
+    //@ts-ignore
+    new Array(1024).fill(5).map((d, i) => {
+      return state.data.texture
+        ? state.data.texture[i % state.data.texture.length]
+        : Math.random();
+    })
+  );
+
+  state.device.queue.writeTexture(
+    { texture: state.texture },
+    data.buffer,
+    {
+      bytesPerRow: 3200,
+      rowsPerImage: 600,
+    },
+    [256, 1]
+  );
+  }
+}
+
+
+
+
+async function makeTexture(state: any) {
+  if (HTMLImageElement === state?.data?.texture?.constructor) {
+    let img = state.data.texture;
+    await img.decode();
+    await createImageBitmap(img);
+    await img.decode();
+    let imageBitmap =  await createImageBitmap(img); 
+
+    let texture = state.device.createTexture({
+      size: [imageBitmap.width, imageBitmap.height, 1],
+      format: "rgba8unorm",
+      usage:
+        GPUTextureUsage.TEXTURE_BINDING |
+        GPUTextureUsage.COPY_DST |
+        GPUTextureUsage.RENDER_ATTACHMENT,
+    });
+    state.device.queue.copyExternalImageToTexture(
+      { source: imageBitmap },
+      { texture: texture },
+      [imageBitmap.width, imageBitmap.height]
+    );
+    state.texture = texture;
+    updateTexture(state);
+    return texture;
+  } else if ("string" === typeof state.data.texture) {
+    let texture = state.device.createTexture({
+      size: [900, 500, 1],
+      format: "rgba8unorm",
+      usage:
+        GPUTextureUsage.TEXTURE_BINDING |
+        GPUTextureUsage.COPY_DST |
+        GPUTextureUsage.RENDER_ATTACHMENT,
+    });
+
+    let imageBitmap = await makeImgTexture(state);
+
+    state.device.queue.copyExternalImageToTexture(
+      { source: imageBitmap },
+      { texture: texture },
+      [imageBitmap.width, imageBitmap.height]
+    );
+    state.texture = texture;
+    updateTexture(state);
+    return texture;
+  } else {
+    let texture = state.device.createTexture({
+      size: [256, 1, 1],
+      format: "rgba8unorm",
+      usage:
+        GPUTextureUsage.TEXTURE_BINDING |
+        GPUTextureUsage.COPY_DST |
+        GPUTextureUsage.RENDER_ATTACHMENT,
+    });
+    let music = new Float32Array(
+      new Array(800)
+        .fill(5)
+        .map((d: any, i) =>
+          state.data.texture
+            ? state.data.texture[(i % state.data.texture.length) + d]
+            : Math.random()
+        )
+    );
+
+    state.texture = texture
+    state.data.music = music;
+    updateTexture(state);
+
+    return texture;
+  }
+}
+
+
+
+
 const createBuffer = (device:any, arr:any, usage:any,) => {
 
     let desc = {
@@ -42,6 +143,19 @@ const createBuffer = (device:any, arr:any, usage:any,) => {
     return canvas;
   }
 
+  let makeImgTexture = async (state: any) => {
+    const img = document.createElement("img");
+    const source = img;
+    source.width = innerWidth;
+    source.height = innerHeight;
+  
+    img.src = state.data.texture;
+  
+    await img.decode();
+  
+    return await createImageBitmap(img);
+  };
+
   export default {
-      createBuffer,  createCanvas, validateData, addMouseEvents
+      createBuffer,  createCanvas, validateData, addMouseEvents, makeTexture, updateTexture, makeImgTexture
   }
