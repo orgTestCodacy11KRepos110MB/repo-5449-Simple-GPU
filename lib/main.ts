@@ -204,10 +204,23 @@ const recordRenderPass = async function (state: any) {
 
     passEncoder.setPipeline(_.pipeline);
 
-    passEncoder.setBindGroup(0,
+    // passEncoder.setBindGroup(0,
+    //    Array.isArray(_.bindGroup) ? _.bindGroup[t % 2] : _.bindGroup
+    //    );
+if (Array.isArray(_.bindGroup)) {
+  _.bindGroup.forEach(function (bindGroup, i) {
+//console.log(bindGroup, i )
+    passEncoder.setBindGroup(i,
+        bindGroup
+         );
+  })
+} else {
+      passEncoder.setBindGroup(0,
        Array.isArray(_.bindGroup) ? _.bindGroup[t % 2] : _.bindGroup
        );
- 
+}
+
+
     if (_.vertexBuffers)
       _.vertexBuffers.forEach(function (vertexBuffer: any, i: any) {
         passEncoder.setVertexBuffer(i, vertexBuffer);

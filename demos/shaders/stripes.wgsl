@@ -41,8 +41,8 @@ fn main_fragment(
         color = color + f32(maxiter - i) / (f2 + .01);
     }
 
-    var color3 = vec3<f32>(.0 - 1.0 / (1 + color * (.09 / f32(maxiter * maxiter))));
+    var color3 = vec3<f32>(.2 - 1.0 / (0 + color * (.9 / f32(maxiter * maxiter))));
     color3 = color3 * color3;
-    return 1.0 - vec4<f32>(color3[1], color3[2], color3[0], 1.0);
+    return .5 - vec4<f32>(color3[1], color3[2], color3[0], 1.0);
 };
 

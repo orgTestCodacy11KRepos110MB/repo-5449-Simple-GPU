@@ -101,7 +101,7 @@ let demos = [
   })
 
 function customShader(options) {
-  let start = window.location.host === "localhost:3000" ? start_loop_static : start_loop_nb;
+  let start = start_loop_static;
   start(options);
 }
 
