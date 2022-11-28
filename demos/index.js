@@ -1,4 +1,3 @@
-import shapeTransition from "./webgl/shape-transition";
 import { init} from "../lib/main";
 import rings from './shaders/rings.wgsl?raw';
 import stripes from './shaders/stripes.wgsl?raw';
@@ -8,17 +7,17 @@ import mouse from './shaders/mouse.wgsl?raw';
 import texture from './shaders/texture.wgsl?raw';
 import sky from './shaders/sky.wgsl?raw';
 
-import four from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/four.wgsl?raw'
+import four from  './shaders/four.wgsl?raw'
 
-import five from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/five.wgsl?raw'
+import five from  './shaders/five.wgsl?raw'
 // import hello from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/morning.wgsl?raw'
-import music from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/music.wgsl?raw'
+import music from  './shaders/music.wgsl?raw'
 
-import six from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/six.wgsl?raw'
+import six from  './shaders/six.wgsl?raw'
 
-import seven from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/seven.wgsl?raw'
+import seven from  './shaders/seven.wgsl?raw'
 
-import light from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/light.wgsl?raw'
+import light from  './shaders/light.wgsl?raw'
 
 //import halfBaked from  '/Users/awahab/Simple-webgpu-compute/demos/shaders/halfBaked.wgsl?raw'
 
@@ -76,13 +75,13 @@ function textureDemo() {
   
 }
 let demoTitles = [
-  'shapeTransition', 'stripes', 'rings', 'checkerboard', 'one', 'mouse', 'texture', 'sky', 
+  'stripes', 'rings', 'checkerboard', 'one', 'mouse', 'texture', 'sky', 
    'four', 'five', 'music', 'six', 'seven', 'light', 'physics', 
    'blur'
 ]
 
 let demos = [
-   shapeTransition, stripes, rings, checkerboard, one, mouse, texture, sky,
+   stripes, rings, checkerboard, one, mouse, texture, sky,
 
    four, five, music, six, seven, light, physics, 
     blur
