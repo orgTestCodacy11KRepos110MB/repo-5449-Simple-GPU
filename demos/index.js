@@ -34,27 +34,41 @@ import { init } from "../lib/main";
 
 
 // let defaultDemo = 'physics';
- let data = {
- 
- }
+
+
+//how to merge default with data fall-through
+//remove default but burden user with adding mouse,
+// import mouse
+// uni 
+//time
+//mouse
+//width
+//height
+
+
  start_loop_static({shader: seven})
- particles()
-async function start_loop_static(options) {
-  options.data = options.data || data; 
-options.clearValue =  { r: 0.0, g: 0.0, b: 0.0, a: 1.0 }
-  // options.data.texture = '../data/static.jpg';
+async function start_loop_static() {
 
-  // const img = new Image();
-  // img.src = '../data/static.jpg';
 
-  // options.data.texture =  img
+  let options = {
+    vert: '',
+    frag: '',
+    buffers: {
+      pos: [],
+      uv: []
+    },
+    uniforms: {
+        hello: 132
+    }
+  }
+  
 
   let draw = await init(options);
-  draw(data);
+  draw(options);
   
   requestAnimationFrame(function test() {
     //if (stuff) data.texture = stuff()
-    draw(data);
+    draw(options.uniforms);
       requestAnimationFrame(test)
       //setTimeout(test, 500)
   });

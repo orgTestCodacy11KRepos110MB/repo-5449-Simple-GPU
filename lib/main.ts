@@ -247,23 +247,30 @@ const recordRenderPass = async function (state: any) {
 };
 
 function updateUniforms(state: any) {
-  let { data, device } = state;
+ let device = state.device;
 
-  let values: any = Object.values(data).filter(
+  let values: any = Object.values(state.options.uniforms).filter(
     (val) => typeof val !== "object"
   );
 
   let uniformsArray = new Float32Array(values.length);
   uniformsArray.set(values, 0);
-
   if (state.uniformsBuffer) {
+   
+    console.log( state.uniformsBuffer,
+      uniformsArray.buffer,
+      0,
+      4 * uniformsArray.length)
+
     device.queue.writeBuffer(
       state.uniformsBuffer,
-      0,
       uniformsArray.buffer,
       0,
       4 * uniformsArray.length
     );
+
+    
+
     return state.uniformsBuffer;
   } else {
     return (state.uniformsBuffer = utils.createBuffer(
@@ -291,7 +298,7 @@ async function makePipeline(state: any) {
     },
 
     primitive: {
-      topology: "point-list",
+      topology: "triangle-list",
     },
   } as GPURenderPipelineDescriptor;
 
@@ -453,12 +460,11 @@ function makeShaderModule(state: any, source: any) {
     @builtin(vertex_index) VertexIndex : u32,
   ) -> VertexOutput {
     const pos = array(
-      vec2( .0, .0),
-      vec2( .0, .0),
-      vec2(.0, .0),
-      vec2( .0,  .0),
-      vec2(.0, .0),
-      vec2(.0,  .0),
+      vec2( 1.0,  1.0),
+      vec2( 1.0, -1.0),
+      vec2(-1.0, -1.0),
+      vec2( 1.0,  1.0),
+      vec2(-1.0, -1.0),
     );
   
     const uv = array(
@@ -570,6 +576,8 @@ let defaultData = {
   angle: 0,
 };
 
+//init takes a canvas and returns a draw call
+//scheduler takes draw calls that were called and runs them with the associated canvas
 async function init(options: any) {
   let canvas = options.canvas || utils.createCanvas();
   const state = {
@@ -578,7 +586,13 @@ async function init(options: any) {
     data: Object.assign(defaultData, options.data), //user data
     compute: options.compute, //user data
     renderPasses: [], //internal state
+    queueSubmit: function () {
+      requestAnimationFrame(function () {
+        device.queue.submit([commandEncoder.finish()]);
+      })
+    }
   };
+
 
   utils.addMouseEvents(canvas, state.data);
 
@@ -620,4 +634,33 @@ async function init(options: any) {
 
 init.version = "1.0.0";
 
-export { init };
+function initDrawCall() {
+  return function (state) {
+  
+  const passEncoder = state.commandEncoder.beginRenderPass(renderPassDescriptor);
+  passEncoder.setPipeline(state.renderPipeline);
+  passEncoder.setBindGroup(0, state.uniformBindGroup);
+  passEncoder.setVertexBuffer(0, state.particlesBuffer);
+  passEncoder.setVertexBuffer(1, state.quadVertexBuffer);
+  passEncoder.draw(6, state.numParticles, 0, 0);
+  passEncoder.end();
+  }
+}
+function initComputeCall(state){
+  return function (state) {
+  const passEncoder = state.commandEncoder.beginComputePass();
+  passEncoder.setPipeline(state.computePipeline);
+  passEncoder.setBindGroup(0, state.computeBindGroup);
+  passEncoder.dispatchWorkgroups(Math.ceil(state.numParticles / 64));
+  passEncoder.end();
+  state.queueSubmit();
+  }
+}
+function loop() {}
+
+export { init,
+initDrawCall,
+initComputeCall,
+loop,
+
+};

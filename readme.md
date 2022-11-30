@@ -2,7 +2,6 @@
 simplest GPGPU compute library ever
 
 
-
 Features 
 1. Simple Particle Renderer 
 2. Simple Compute engine
@@ -16,6 +15,8 @@ With Simple WebGPU COmpute you can describe data visualizations in a JSON format
 
 
 
+
+this is for open source company for childrens math magical simulation comic books like redhat
 
 
 
