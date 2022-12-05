@@ -588,7 +588,7 @@ async function compile(state, options) {
 
 let defaultData = {
   width: innerWidth, //based on canvas
-  height: innerHeight, //based on canvas
+  height: innerHeight,
   pixelRatio: 2, //recompile
   time: 0,
   mouseX: 0,
