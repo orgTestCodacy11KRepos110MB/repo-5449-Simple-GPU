@@ -130,15 +130,16 @@ async function postProcessing() {
     },
     bindGroup: function ({pipeline}) { 
       return [pipeline.getBindGroupLayout(0), [cubeTexture.sampler, 
-        // textures[1].createView()
         cubeTexture.texture.createView()
       ]]}
   })
 
   const blurParamsBuffer = utils.paramsBuffer(device)
-
   const compute = webgpu.initComputeCall({
     code: blurWGSL,
+    uniforms: {
+      filterSize:15
+    },
     bindGroups: function (state, computePipeline) {
       const device = state.device;
       const blurPipeline = computePipeline
