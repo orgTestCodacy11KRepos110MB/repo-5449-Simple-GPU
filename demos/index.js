@@ -20,11 +20,11 @@ import postProcessing from "./postProcessing";
 
 import matrixMultiply from "./matrix-multiply";
 
-import lines from "./lines";
+//import lines from "./lines";
 
 import icosahedron from "./icosahedron";
 
-//import resizeCanvas from "./resizeCanvas";
+//import points from "./points";
 
 import hexagon from "./h3-hexagon";
 
@@ -47,11 +47,11 @@ let draw = await init(options);
 
 let demoTitles = [
   'basic' , 'hexagon', 'cube',
-  'texturedCube', 'light', 'postProcessing', 'matrixMultiply',  'icosahedron', 'lines'
+  'texturedCube', 'light', 'postProcessing', 'matrixMultiply',  'icosahedron'
 ]
 
 let demos = [
-basic, hexagon, cube, texturedCube, light, postProcessing,   matrixMultiply, icosahedron, lines
+basic, hexagon, cube, texturedCube, light, postProcessing,   matrixMultiply, icosahedron
 ]
 
   document.querySelectorAll('input').forEach(e => {

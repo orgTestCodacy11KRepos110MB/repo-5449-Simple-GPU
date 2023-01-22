@@ -42,17 +42,19 @@ async function main () {
 fn fragMain() -> @location(0) vec4<f32> {
     return vec4(1.0, 0.0, 0.0, 1.0);
 }
+struct VertexOutput {
+  @builtin(position) clipPosition : vec4<f32>,
+  //@location(0) fragColor : vec3<f32>,
+}
+
 @vertex
 fn vertMain(
     @builtin(vertex_index) VertexIndex : u32,   @location(0) position : vec4<f32>,
 
-) -> @builtin(position) vec4<f32> {
-    var pos = array<vec2<f32>, 3>(
-        vec2(0.0, 0.5),
-        vec2(-0.5, -0.5),
-        vec2(0.5, -0.5)
-    );
-    return vec4<f32>(pos[VertexIndex], 0.0, 1.0);
+) -> VertexOutput {
+  var result : VertexOutput;
+  result.clipPosition = position;
+  return result;
 }`
   })
 
@@ -63,13 +65,12 @@ fn vertMain(
       entryPoint: 'vertMain',
       buffers: [
         {
-          arrayStride: 0,
+          arrayStride: 2 * 4,
           attributes: [
             {
-              // position
               shaderLocation: 0,
               offset: 0,
-              format: 'float32x4',
+              format: 'float32x2',
             },
           ],
         },
@@ -113,7 +114,7 @@ fn vertMain(
     passEncoder.setPipeline(pipeline)
     passEncoder.setVertexBuffer(0, verticesBuffer);
 
-    passEncoder.draw(3)
+    passEncoder.draw(6)
     passEncoder.end()
     device.queue.submit([commandEncoder.finish()])
     requestAnimationFrame(frame)
