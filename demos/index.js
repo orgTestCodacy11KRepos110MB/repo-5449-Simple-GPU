@@ -22,7 +22,7 @@ import postProcessing from "./postProcessing";
 
 import matrixMultiply from "./matrix-multiply";
 
-//import points from "./points";
+import lines from "./lines";
 
 import icosahedron from "./icosahedron";
 
@@ -47,11 +47,11 @@ let draw = await init(options);
 
 let demoTitles = [
   'basic' , 'hexagon', 'cube',
-  'texturedCube', 'light', 'postProcessing', 'matrixMultiply',  'icosahedron'
+  'texturedCube', 'light', 'postProcessing', 'matrixMultiply',  'icosahedron', 'lines'
 ]
 
 let demos = [
-basic, hexagon, cube, texturedCube, light, postProcessing,   matrixMultiply, icosahedron
+basic, hexagon, cube, texturedCube, light, postProcessing,   matrixMultiply, icosahedron, lines
 ]
 
   document.querySelectorAll('input').forEach(e => {
