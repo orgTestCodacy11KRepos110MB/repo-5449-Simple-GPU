@@ -9,8 +9,6 @@
 
 import basic from "./basic";
 
-import hexagon from "./h3-hexagon";
-
 import cube from "./cube";
 
 import texturedCube from "./texturedCube";
@@ -27,6 +25,8 @@ import lines from "./lines";
 import icosahedron from "./icosahedron";
 
 //import resizeCanvas from "./resizeCanvas";
+
+import hexagon from "./h3-hexagon";
 
 
 let defaultDemo = 'physics';
