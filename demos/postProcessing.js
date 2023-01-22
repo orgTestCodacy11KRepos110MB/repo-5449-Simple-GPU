@@ -128,17 +128,16 @@ async function postProcessing() {
               fragEntryPoint: "frag_main",
               vertEntryPoint: "vert_main"
     },
-    bindGroup: function ({pipeline}) { 
-      return [pipeline.getBindGroupLayout(0), [cubeTexture.sampler, 
-        cubeTexture.texture.createView()
-      ]]}
+    bindGroup: ({pipeline}) => { 
+      return [pipeline.getBindGroupLayout(0), [cubeTexture.sampler, cubeTexture.texture.createView()]]
+    }
   })
 
   const blurParamsBuffer = utils.paramsBuffer(device)
   const compute = webgpu.initComputeCall({
     code: blurWGSL,
     uniforms: {
-      filterSize:15
+      filterSize: 15
     },
     bindGroups: function (state, computePipeline) {
       const device = state.device;
@@ -151,7 +150,7 @@ async function postProcessing() {
       const computeBindGroup1 = device.createBindGroup(utils.makeBindGroupDescriptor(blurPipeline.getBindGroupLayout(1), [textures[0].createView(),  textures[1].createView(), buffer1,], 1))
       const computeBindGroup2 = device.createBindGroup(utils.makeBindGroupDescriptor(blurPipeline.getBindGroupLayout(1), [textures[1].createView(),  textures[0].createView(), buffer0,], 1))
       return [computeConstants, computeBindGroup0, computeBindGroup1, computeBindGroup2]
-    }
+    },
   })
 
   const settings = {
@@ -181,3 +180,4 @@ async function postProcessing() {
 
   }
   export default postProcessing;
+//450 -> 150 3x
