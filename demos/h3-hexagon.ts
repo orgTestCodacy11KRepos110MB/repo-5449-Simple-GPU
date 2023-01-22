@@ -44,7 +44,8 @@ fn fragMain() -> @location(0) vec4<f32> {
 }
 @vertex
 fn vertMain(
-    @builtin(vertex_index) VertexIndex : u32
+    @builtin(vertex_index) VertexIndex : u32,   @location(0) position : vec4<f32>,
+
 ) -> @builtin(position) vec4<f32> {
     var pos = array<vec2<f32>, 3>(
         vec2(0.0, 0.5),
@@ -59,7 +60,20 @@ fn vertMain(
     layout: 'auto',
     vertex: {
       module: shaderModule,
-      entryPoint: 'vertMain'
+      entryPoint: 'vertMain',
+      buffers: [
+        {
+          arrayStride: 0,
+          attributes: [
+            {
+              // position
+              shaderLocation: 0,
+              offset: 0,
+              format: 'float32x4',
+            },
+          ],
+        },
+      ],
     },
     fragment: {
       module: shaderModule,
@@ -74,6 +88,15 @@ fn vertMain(
       topology: 'triangle-list',
     },
   })
+  const cubeVertexArray = new Float32Array(64)
+
+  const verticesBuffer = device.createBuffer({
+    size: cubeVertexArray.byteLength,
+    usage: GPUBufferUsage.VERTEX,
+    mappedAtCreation: true,
+  });
+  new Float32Array(verticesBuffer.getMappedRange()).set(cubeVertexArray);
+  verticesBuffer.unmap();
 
   function frame () {
     const commandEncoder = device.createCommandEncoder()
@@ -88,6 +111,8 @@ fn vertMain(
       ],
     })
     passEncoder.setPipeline(pipeline)
+    passEncoder.setVertexBuffer(0, verticesBuffer);
+
     passEncoder.draw(3)
     passEncoder.end()
     device.queue.submit([commandEncoder.finish()])
