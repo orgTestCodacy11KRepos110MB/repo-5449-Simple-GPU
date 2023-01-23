@@ -99,7 +99,7 @@ fn vertMain(
 
   var x = 0; //x coordinate for the center of the hexagon
   var y = 0; //y coordinate for the center of the hexagon
-  var r = .2; //radius of the circle upon which the vertices of the hexagon lie.
+  var r = .11; //radius of the circle upon which the vertices of the hexagon lie.
   var xCoord = new Array(3 * 6);
   var yCoord = new Array(3 * 6);
 
@@ -122,16 +122,16 @@ fn vertMain(
   }
 
   for (let i = 0; i < 18; i+= 3) {
-    makeHexagon(x+.6,y,r, i, 18)
+    makeHexagon(x+.3,y,r, i, 18)
   }
 
   for (let i = 0; i < 18; i+= 3) {
-    makeHexagon(x-.6,y,r, i, 36)
+    makeHexagon(x-.3,y,r, i, 36)
   }
 
 
   for (let i = 0; i < 18; i+= 3) {
-    makeHexagon(x+.3,y+.3,r, i, 54)
+    makeHexagon(x+.15,y+.15,r, i, 54)
   }
 //}
 
