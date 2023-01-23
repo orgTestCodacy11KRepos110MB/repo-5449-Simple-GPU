@@ -10,8 +10,8 @@ mustHave(navigator.gpu)
  function makeCanvas () {
   const canvas = document.createElement('canvas')
   Object.assign(canvas.style, {
-    width: '100%',
-    height: '100%',
+    width: '500px',
+    height: '500px',
     position: 'absolute',
     left: '0',
     top: '0',
@@ -86,39 +86,64 @@ fn vertMain(
       ],
     },
     primitive: {
-      topology: 'triangle-strip',
+      topology: 'triangle-list',
     },
     frontFace: 'ccw',
     cullMode: 'none'
   })
 
-  const cubeVertexArray = new Float32Array(128)
+  const cubeVertexArray = new Float32Array(1e6)
   const center = {x:0, y: 0}
 
 //  console.log(cubeVertexArray)
 
   var x = 0; //x coordinate for the center of the hexagon
   var y = 0; //y coordinate for the center of the hexagon
-  var r = .3; //radius of the circle upon which the vertices of the hexagon lie.
-  var q = Math.sqrt(Math.pow(r,2) - Math.pow((r/2),2)); //y coordinate of the points that are above and below center point
+  var r = .2; //radius of the circle upon which the vertices of the hexagon lie.
   var xCoord = new Array(3 * 6);
   var yCoord = new Array(3 * 6);
 
   const DEG2RAD = Math.PI / 180;
 
-  function makeHexagon(x, y, r, i) { 
+  function makeHexagon(x, y, r, i, j=0) { 
     let deg1 = (i / 3)  * 60
     let deg2 = (i / 3 + 1) * 60
-    xCoord[i+0] = x;
-    yCoord[i+0] = y;
-    xCoord[i+1] = x + r * Math.cos(deg1 * DEG2RAD)
-    yCoord[i+1] = y + r * Math.sin(deg1 * DEG2RAD)
-    xCoord[i+2] = x + r * Math.cos(deg2  * DEG2RAD)
-    yCoord[i+2] = y + r * Math.sin(deg2 * DEG2RAD)
+    xCoord[i+0+j] = x;
+    yCoord[i+0+j] = y;
+    xCoord[i+1+j] = x + r * Math.cos(deg1 * DEG2RAD)
+    yCoord[i+1+j] = y + r * Math.sin(deg1 * DEG2RAD)
+    xCoord[i+2+j] = x + r * Math.cos(deg2  * DEG2RAD)
+    yCoord[i+2+j] = y + r * Math.sin(deg2 * DEG2RAD)
   }  
 
-  for (let i = 0; i < xCoord.length; i+= 3) {
+//  for (let j = 0; j < 3; j++) {
+  for (let i = 0; i < 18; i+= 3) {
     makeHexagon(x,y,r, i)
+  }
+
+  for (let i = 0; i < 18; i+= 3) {
+    makeHexagon(x+.6,y,r, i, 18)
+  }
+
+  for (let i = 0; i < 18; i+= 3) {
+    makeHexagon(x-.6,y,r, i, 36)
+  }
+
+
+  for (let i = 0; i < 18; i+= 3) {
+    makeHexagon(x+.3,y+.3,r, i, 54)
+  }
+//}
+
+// for (let i = 0; i < xCoord.length; i+= 3) {
+//   makeHexagon(x,y,r, i)
+// }
+
+ //for (let i = 0; i < xCoord.length; i+= 3) {
+
+// }
+
+  
   //     xCoord[0] = x;
   //     yCoord[0] = y;
   //     xCoord[1] = x + r * Math.cos(0 * DEG2RAD)
@@ -148,7 +173,7 @@ fn vertMain(
   // xCoord[10] = x + r * Math.cos(360 * DEG2RAD)
   // yCoord[10] = y + r * Math.sin(360 * DEG2RAD)
   
-  }
+
 
  
   //h3 hexagons in webGPU so compute shaders can be used for interactive query processing
@@ -189,7 +214,7 @@ fn vertMain(
     passEncoder.setPipeline(pipeline)
     passEncoder.setVertexBuffer(0, verticesBuffer);
 
-    passEncoder.draw(64)
+    passEncoder.draw(128)
     passEncoder.end()
     device.queue.submit([commandEncoder.finish()])
     requestAnimationFrame(frame)
