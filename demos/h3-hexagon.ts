@@ -106,14 +106,26 @@ fn vertMain(
 
   const DEG2RAD = Math.PI / 180;
 
-  for (let i = 0; i < xCoord.length; i+= 3) {
-  xCoord[0] = x;
-  yCoord[0] = y;
-  xCoord[1] = x + r * Math.cos(0 * DEG2RAD)
-  yCoord[1] = y + r * Math.sin(0 * DEG2RAD)
-  xCoord[2] = x + r * Math.cos(60  * DEG2RAD)
-  yCoord[2] = y + r * Math.sin(60 * DEG2RAD)
+  function makeHexagon(x, y, r, i) { 
+    let deg1 = (i / 3)  * 60
+    let deg2 = (i / 3 + 1) * 60
+    xCoord[i+0] = x;
+    yCoord[i+0] = y;
+    xCoord[i+1] = x + r * Math.cos(0 * DEG2RAD)
+    yCoord[i+1] = y + r * Math.sin(0 * DEG2RAD)
+    xCoord[i+2] = x + r * Math.cos(60  * DEG2RAD)
+    yCoord[i+2] = y + r * Math.sin(60 * DEG2RAD)
+  }  
 
+  for (let i = 0; i < xCoord.length; i+= 3) {
+    
+      xCoord[0] = x;
+      yCoord[0] = y;
+      xCoord[1] = x + r * Math.cos(0 * DEG2RAD)
+      yCoord[1] = y + r * Math.sin(0 * DEG2RAD)
+      xCoord[2] = x + r * Math.cos(60  * DEG2RAD)
+      yCoord[2] = y + r * Math.sin(60 * DEG2RAD)
+    
 
   xCoord[3] = x;
   yCoord[3] = y;
@@ -135,6 +147,7 @@ fn vertMain(
   yCoord[9] = y + r * Math.sin(300 * DEG2RAD)
   xCoord[10] = x + r * Math.cos(360 * DEG2RAD)
   yCoord[10] = y + r * Math.sin(360 * DEG2RAD)
+  
   }
 
  
