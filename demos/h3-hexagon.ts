@@ -111,42 +111,42 @@ fn vertMain(
     let deg2 = (i / 3 + 1) * 60
     xCoord[i+0] = x;
     yCoord[i+0] = y;
-    xCoord[i+1] = x + r * Math.cos(0 * DEG2RAD)
-    yCoord[i+1] = y + r * Math.sin(0 * DEG2RAD)
-    xCoord[i+2] = x + r * Math.cos(60  * DEG2RAD)
-    yCoord[i+2] = y + r * Math.sin(60 * DEG2RAD)
+    xCoord[i+1] = x + r * Math.cos(deg1 * DEG2RAD)
+    yCoord[i+1] = y + r * Math.sin(deg1 * DEG2RAD)
+    xCoord[i+2] = x + r * Math.cos(deg2  * DEG2RAD)
+    yCoord[i+2] = y + r * Math.sin(deg2 * DEG2RAD)
   }  
 
   for (let i = 0; i < xCoord.length; i+= 3) {
+    makeHexagon(x,y,r, i)
+  //     xCoord[0] = x;
+  //     yCoord[0] = y;
+  //     xCoord[1] = x + r * Math.cos(0 * DEG2RAD)
+  //     yCoord[1] = y + r * Math.sin(0 * DEG2RAD)
+  //     xCoord[2] = x + r * Math.cos(60  * DEG2RAD)
+  //     yCoord[2] = y + r * Math.sin(60 * DEG2RAD)
     
-      xCoord[0] = x;
-      yCoord[0] = y;
-      xCoord[1] = x + r * Math.cos(0 * DEG2RAD)
-      yCoord[1] = y + r * Math.sin(0 * DEG2RAD)
-      xCoord[2] = x + r * Math.cos(60  * DEG2RAD)
-      yCoord[2] = y + r * Math.sin(60 * DEG2RAD)
-    
 
-  xCoord[3] = x;
-  yCoord[3] = y;
-  xCoord[4] = x + r * Math.cos(120 * DEG2RAD)
-  yCoord[4] = y + r * Math.sin(120 * DEG2RAD)
-  xCoord[5] = x + r * Math.cos(180 * DEG2RAD)
-  yCoord[5] = y + r * Math.sin(180 * DEG2RAD)
+  // xCoord[3] = x;
+  // yCoord[3] = y;
+  // xCoord[4] = x + r * Math.cos(120 * DEG2RAD)
+  // yCoord[4] = y + r * Math.sin(120 * DEG2RAD)
+  // xCoord[5] = x + r * Math.cos(180 * DEG2RAD)
+  // yCoord[5] = y + r * Math.sin(180 * DEG2RAD)
 
-  xCoord[6] = x;
-  yCoord[6] = y;
-  xCoord[7] = x + r * Math.cos(240 * DEG2RAD)
-  yCoord[7] = y + r * Math.sin(240 * DEG2RAD)
-  xCoord[8] = x + r * Math.cos(300 * DEG2RAD)
-  yCoord[8] = y + r * Math.sin(300 * DEG2RAD)
+  // xCoord[6] = x;
+  // yCoord[6] = y;
+  // xCoord[7] = x + r * Math.cos(240 * DEG2RAD)
+  // yCoord[7] = y + r * Math.sin(240 * DEG2RAD)
+  // xCoord[8] = x + r * Math.cos(300 * DEG2RAD)
+  // yCoord[8] = y + r * Math.sin(300 * DEG2RAD)
 
-  xCoord[8] = x;
-  yCoord[8] = y;
-  xCoord[9] = x + r * Math.cos(300 * DEG2RAD)
-  yCoord[9] = y + r * Math.sin(300 * DEG2RAD)
-  xCoord[10] = x + r * Math.cos(360 * DEG2RAD)
-  yCoord[10] = y + r * Math.sin(360 * DEG2RAD)
+  // xCoord[8] = x;
+  // yCoord[8] = y;
+  // xCoord[9] = x + r * Math.cos(300 * DEG2RAD)
+  // yCoord[9] = y + r * Math.sin(300 * DEG2RAD)
+  // xCoord[10] = x + r * Math.cos(360 * DEG2RAD)
+  // yCoord[10] = y + r * Math.sin(360 * DEG2RAD)
   
   }
 
