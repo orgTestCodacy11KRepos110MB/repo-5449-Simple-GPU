@@ -90,6 +90,10 @@ fn vertMain(
     },
   })
   const cubeVertexArray = new Float32Array(64)
+  cubeVertexArray.set(
+    [-1, 0, -1, 1, 1, 0],
+    0
+  )
 
   const verticesBuffer = device.createBuffer({
     size: cubeVertexArray.byteLength,
