@@ -72,6 +72,7 @@ fn vertMain(
               offset: 0,
               format: 'float32x2',
             },
+            
           ],
         },
       ],
@@ -95,11 +96,9 @@ fn vertMain(
   const cubeVertexArray = new Float32Array(1e6)
   const center = {x:0, y: 0}
 
-//  console.log(cubeVertexArray)
-
   var x = 0; //x coordinate for the center of the hexagon
   var y = 0; //y coordinate for the center of the hexagon
-  var r = .11; //radius of the circle upon which the vertices of the hexagon lie.
+  var r = .1; //radius of the circle upon which the vertices of the hexagon lie.
   var xCoord = new Array(3 * 6);
   var yCoord = new Array(3 * 6);
 
@@ -122,11 +121,11 @@ fn vertMain(
   }
 
   for (let i = 0; i < 18; i+= 3) {
-    makeHexagon(x+.3,y,r, i, 18)
+    makeHexagon(x+.33,y,r, i, 18)
   }
 
   for (let i = 0; i < 18; i+= 3) {
-    makeHexagon(x-.3,y,r, i, 36)
+    makeHexagon(x-.25,y,r, i, 36)
   }
 
 
