@@ -86,14 +86,105 @@ fn vertMain(
       ],
     },
     primitive: {
-      topology: 'triangle-list',
+      topology: 'triangle-strip',
     },
+    frontFace: 'ccw',
+    cullMode: 'none'
   })
-  const cubeVertexArray = new Float32Array(64)
-  cubeVertexArray.set(
-    [-1, 0, -1, 1, 1, 0],
-    0
-  )
+
+  const cubeVertexArray = new Float32Array(128)
+  const center = {x:0, y: 0}
+
+  for (var i = 0; i < 12; i+=6) {
+    cubeVertexArray.set(
+      pointy_hex_corner(center, .5, i),
+      i
+    )
+
+    
+
+  }
+
+  function pointy_hex_corner(center, size, i) {
+    let angle_deg = 60 * i - 30;
+    let angle_rad = Math.PI / 18 * angle_deg
+
+    let angle_deg2 = 60 * i 
+    let angle_rad2 = Math.PI / 18 * angle_deg
+
+    return [0,0,
+            center.x + size * Math.cos(angle_rad),
+            center.y + size * Math.sin(angle_rad),
+
+            center.x + size * Math.cos(angle_rad2),
+            center.y + size * Math.sin(angle_rad2)
+    ]
+  }
+
+
+//  console.log(cubeVertexArray)
+
+  var x = 0; //x coordinate for the center of the hexagon
+  var y = 0; //y coordinate for the center of the hexagon
+  var r = .5; //radius of the circle upon which the vertices of the hexagon lie.
+  var q = Math.sqrt(Math.pow(r,2) - Math.pow((r/2),2)); //y coordinate of the points that are above and below center point
+  var xCoord = new Array(3 * 6);
+  var yCoord = new Array(3 * 6);
+
+  const DEG2RAD = Math.PI / 180;
+
+  //for (let i = 0; i < xCoord.length; i+= 3) {
+  xCoord[0] = x;
+  yCoord[0] = y;
+  xCoord[1] = x + r * Math.cos(30 * DEG2RAD)
+  yCoord[1] = y + r * Math.sin(30 * DEG2RAD)
+  xCoord[2] = x + r * Math.cos(90  * DEG2RAD)
+  yCoord[2] = y + r * Math.sin(90* DEG2RAD)
+
+
+  xCoord[3] = x;
+  yCoord[3] = y;
+  xCoord[4] = x + r * Math.cos(90 * DEG2RAD)
+  yCoord[4] = y + r * Math.sin(90 * DEG2RAD)
+  xCoord[5] = x + r * Math.cos(150 * DEG2RAD)
+  yCoord[5] = y + r * Math.sin(150 * DEG2RAD)
+
+  xCoord[6] = x;
+  yCoord[6] = y;
+  xCoord[7] = x + r * Math.cos(150 * DEG2RAD)
+  yCoord[7] = y + r * Math.sin(150 * DEG2RAD)
+  xCoord[8] = x + r * Math.cos(210 * DEG2RAD)
+  yCoord[8] = y + r * Math.sin(210 * DEG2RAD)
+
+  xCoord[8] = x;
+  yCoord[8] = y;
+  xCoord[9] = x + r * Math.cos(210 * DEG2RAD)
+  yCoord[9] = y + r * Math.sin(210 * DEG2RAD)
+  xCoord[10] = x + r * Math.cos(270 * DEG2RAD)
+  yCoord[10] = y + r * Math.sin(270 * DEG2RAD)
+
+
+  // xCoord[8] = x;
+  // yCoord[8] = y;
+  // xCoord[9] = x + r * Math.cos(270 * DEG2RAD)
+  // yCoord[9] = y + r * Math.sin(270 * DEG2RAD)
+  // xCoord[10] = x + r * Math.cos(360 * DEG2RAD)
+  // yCoord[10] = y + r * Math.sin(360 * DEG2RAD)
+
+  //h3 hexagons in webGPU so compute shaders can be used for interactive query processing
+  //estimate 2 weeks 
+
+  var vertices = [xCoord[0],yCoord[0]];// Initialize Array
+  
+    for ( var i = 1; i < xCoord.length; ++i ) {
+    vertices.push(xCoord[i]);
+        vertices.push(yCoord[i]);
+    console.log("Coordinate " + i + ": " + xCoord[i] + "," + yCoord[i]);
+    }
+    cubeVertexArray.set(
+      vertices
+      
+    )
 
   const verticesBuffer = device.createBuffer({
     size: cubeVertexArray.byteLength,
@@ -118,7 +209,7 @@ fn vertMain(
     passEncoder.setPipeline(pipeline)
     passEncoder.setVertexBuffer(0, verticesBuffer);
 
-    passEncoder.draw(6)
+    passEncoder.draw(64)
     passEncoder.end()
     device.queue.submit([commandEncoder.finish()])
     requestAnimationFrame(frame)
