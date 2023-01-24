@@ -115,6 +115,19 @@ fn vertMain(
     yCoord[i+2+j] = y + r * Math.sin(deg2 * DEG2RAD)
   }  
 
+
+
+  function makeHexagon2(x, y, r, i, j=0) { 
+    let deg1 = (i / 3)  * 60
+    let deg2 = (i / 3 + 1) * 60
+    xCoord.push(x)
+    yCoord.push(y)
+    xCoord.push(x + r * Math.cos(deg1 * DEG2RAD))
+    yCoord.push(y + r * Math.sin(deg1 * DEG2RAD))
+    xCoord.push(x + r * Math.cos(deg2  * DEG2RAD))
+    yCoord.push(y + r * Math.sin(deg2 * DEG2RAD))
+  }  
+
    const horiz = .75 * .1;
    const vert = Math.sqrt(3) * .11
   //horiz = 3/4 * width = 3/2 * size
@@ -123,7 +136,7 @@ fn vertMain(
   function makeRow(k) {
     for (let j = 0; j < 10; j++) {
       for (let i = 0; i < 18; i +=3) {
-        makeHexagon(x + (3/2 * .2) * j, y + vert * k, r, i, 18 * (j + k))
+        makeHexagon2(x + (3/2 * .2) * j, y + vert * k, r, i, 18 * (j + k))
       }
     }
   }
