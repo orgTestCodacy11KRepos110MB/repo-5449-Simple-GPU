@@ -114,28 +114,12 @@ fn vertMain(
     xCoord[i+2+j] = x + r * Math.cos(deg2  * DEG2RAD)
     yCoord[i+2+j] = y + r * Math.sin(deg2 * DEG2RAD)
   }  
-  
-  // for (let i = 0; i < 18; i+= 3) {
-  //   makeHexagon(x,y,r, i)
-  // }
-
-  // for (let i = 0; i < 18; i+= 3) {
-  //   makeHexagon(x+.33,y,r, i, 18)
-  // }
-
-  // for (let i = 0; i < 18; i+= 3) {
-  //   makeHexagon(x-.25,y,r, i, 36)
-  // }
-
-
-  // for (let i = 0; i < 18; i+= 3) {
-  //   makeHexagon(x+.15,y+.15,r, i, 54)
-  // }
 
    const horiz = .75 * .1;
    const vert = Math.sqrt(3) * .11
   //horiz = 3/4 * width = 3/2 * size
   //vert = height = sqrt(3) * size
+
   function makeRow(k) {
     for (let j = 0; j < 10; j++) {
       for (let i = 0; i < 18; i +=3) {
@@ -143,12 +127,9 @@ fn vertMain(
       }
     }
   }
-
   for (var m = 0; m < 5; m++)
     makeRow(m)
-
- 
-    //makeRow have a marginX for odd
+  //makeRow have a marginX for odd
   //h3 hexagons in webGPU so compute shaders can be used for interactive query processing
   //estimate 2 weeks 
   //databind hexagon color to number of complaints within h3 cell
