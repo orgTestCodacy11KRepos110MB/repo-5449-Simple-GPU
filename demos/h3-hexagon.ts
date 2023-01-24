@@ -96,9 +96,9 @@ fn vertMain(
   const cubeVertexArray = new Float32Array(1e6)
   const center = {x:0, y: 0}
 
-  var x = 0; //x coordinate for the center of the hexagon
-  var y = 0; //y coordinate for the center of the hexagon
-  var r = .1; //radius of the circle upon which the vertices of the hexagon lie.
+  var x = -1; //x coordinate for the center of the hexagon
+  var y = -1; //y coordinate for the center of the hexagon
+  var r = .10; //radius of the circle upon which the vertices of the hexagon lie.
   var xCoord = new Array(3 * 6);
   var yCoord = new Array(3 * 6);
 
@@ -114,69 +114,44 @@ fn vertMain(
     xCoord[i+2+j] = x + r * Math.cos(deg2  * DEG2RAD)
     yCoord[i+2+j] = y + r * Math.sin(deg2 * DEG2RAD)
   }  
-
-//  for (let j = 0; j < 3; j++) {
-  for (let i = 0; i < 18; i+= 3) {
-    makeHexagon(x,y,r, i)
-  }
-
-  for (let i = 0; i < 18; i+= 3) {
-    makeHexagon(x+.33,y,r, i, 18)
-  }
-
-  for (let i = 0; i < 18; i+= 3) {
-    makeHexagon(x-.25,y,r, i, 36)
-  }
-
-
-  for (let i = 0; i < 18; i+= 3) {
-    makeHexagon(x+.15,y+.15,r, i, 54)
-  }
-//}
-
-// for (let i = 0; i < xCoord.length; i+= 3) {
-//   makeHexagon(x,y,r, i)
-// }
-
- //for (let i = 0; i < xCoord.length; i+= 3) {
-
-// }
-
   
-  //     xCoord[0] = x;
-  //     yCoord[0] = y;
-  //     xCoord[1] = x + r * Math.cos(0 * DEG2RAD)
-  //     yCoord[1] = y + r * Math.sin(0 * DEG2RAD)
-  //     xCoord[2] = x + r * Math.cos(60  * DEG2RAD)
-  //     yCoord[2] = y + r * Math.sin(60 * DEG2RAD)
-    
+  // for (let i = 0; i < 18; i+= 3) {
+  //   makeHexagon(x,y,r, i)
+  // }
 
-  // xCoord[3] = x;
-  // yCoord[3] = y;
-  // xCoord[4] = x + r * Math.cos(120 * DEG2RAD)
-  // yCoord[4] = y + r * Math.sin(120 * DEG2RAD)
-  // xCoord[5] = x + r * Math.cos(180 * DEG2RAD)
-  // yCoord[5] = y + r * Math.sin(180 * DEG2RAD)
+  // for (let i = 0; i < 18; i+= 3) {
+  //   makeHexagon(x+.33,y,r, i, 18)
+  // }
 
-  // xCoord[6] = x;
-  // yCoord[6] = y;
-  // xCoord[7] = x + r * Math.cos(240 * DEG2RAD)
-  // yCoord[7] = y + r * Math.sin(240 * DEG2RAD)
-  // xCoord[8] = x + r * Math.cos(300 * DEG2RAD)
-  // yCoord[8] = y + r * Math.sin(300 * DEG2RAD)
+  // for (let i = 0; i < 18; i+= 3) {
+  //   makeHexagon(x-.25,y,r, i, 36)
+  // }
 
-  // xCoord[8] = x;
-  // yCoord[8] = y;
-  // xCoord[9] = x + r * Math.cos(300 * DEG2RAD)
-  // yCoord[9] = y + r * Math.sin(300 * DEG2RAD)
-  // xCoord[10] = x + r * Math.cos(360 * DEG2RAD)
-  // yCoord[10] = y + r * Math.sin(360 * DEG2RAD)
-  
 
+  // for (let i = 0; i < 18; i+= 3) {
+  //   makeHexagon(x+.15,y+.15,r, i, 54)
+  // }
+
+   const horiz = .75 * .1;
+   const vert = Math.sqrt(3) * .11
+  //horiz = 3/4 * width = 3/2 * size
+  //vert = height = sqrt(3) * size
+  function makeRow(k) {
+    for (let j = 0; j < 10; j++) {
+      for (let i = 0; i < 18; i +=3) {
+        makeHexagon(x + (3/2 * .2) * j, y + vert * k, r, i, 18 * (j + k))
+      }
+    }
+  }
+
+  for (var m = 0; m < 5; m++)
+    makeRow(m)
 
  
+    //makeRow have a marginX for odd
   //h3 hexagons in webGPU so compute shaders can be used for interactive query processing
   //estimate 2 weeks 
+  //databind hexagon color to number of complaints within h3 cell
 
   var vertices = [xCoord[0],yCoord[0]];// Initialize Array
   
@@ -213,7 +188,7 @@ fn vertMain(
     passEncoder.setPipeline(pipeline)
     passEncoder.setVertexBuffer(0, verticesBuffer);
 
-    passEncoder.draw(128)
+    passEncoder.draw(1e4)
     passEncoder.end()
     device.queue.submit([commandEncoder.finish()])
     requestAnimationFrame(frame)
