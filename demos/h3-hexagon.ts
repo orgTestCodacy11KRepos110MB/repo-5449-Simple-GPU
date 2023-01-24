@@ -140,7 +140,7 @@ fn vertMain(
       }
     }
   }
-  for (var m = 0; m < 5; m++)
+  for (var m = 0; m < 11; m++)
     makeRow(m)
   //makeRow have a marginX for odd
   //h3 hexagons in webGPU so compute shaders can be used for interactive query processing
