@@ -72,7 +72,11 @@ fn vertMain(
               offset: 0,
               format: 'float32x2',
             },
-            
+              {
+                shaderLocation: 1,
+                offset: 0,
+                format: 'float32x2',
+              },
           ],
         },
       ],
@@ -114,8 +118,6 @@ fn vertMain(
     xCoord.push(x + r * Math.cos(deg2  * DEG2RAD))
     yCoord.push(y + r * Math.sin(deg2 * DEG2RAD))
   }  
-
-   const horiz = .75 * .1;
    const vert = Math.sqrt(3) * .11
   //horiz = 3/4 * width = 3/2 * size
   //vert = height = sqrt(3) * size
@@ -130,21 +132,16 @@ fn vertMain(
   }
   for (var m = 0; m < 11; m++)
     makeRow(m)
-  //makeRow have a marginX for odd
-  //h3 hexagons in webGPU so compute shaders can be used for interactive query processing
-  //estimate 2 weeks 
-  //databind hexagon color to number of complaints within h3 cell
-
+  
   var vertices = [xCoord[0],yCoord[0]];// Initialize Array
   
     for ( var i = 1; i < xCoord.length; ++i ) {
-    vertices.push(xCoord[i]);
-        vertices.push(yCoord[i]);
-    console.log("Coordinate " + i + ": " + xCoord[i] + "," + yCoord[i]);
+      vertices.push(xCoord[i]);
+      vertices.push(yCoord[i]);
+      console.log("Coordinate " + i + ": " + xCoord[i] + "," + yCoord[i]);
     }
     cubeVertexArray.set(
-      vertices
-      
+      vertices 
     )
 
   const verticesBuffer = device.createBuffer({
