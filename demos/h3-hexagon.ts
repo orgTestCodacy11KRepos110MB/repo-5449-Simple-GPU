@@ -98,24 +98,11 @@ fn vertMain(
 
   var x = -1; //x coordinate for the center of the hexagon
   var y = -1; //y coordinate for the center of the hexagon
-  var r = .10; //radius of the circle upon which the vertices of the hexagon lie.
+  var r = .09; //radius of the circle upon which the vertices of the hexagon lie.
   var xCoord = new Array(3 * 6);
   var yCoord = new Array(3 * 6);
 
   const DEG2RAD = Math.PI / 180;
-
-  function makeHexagon(x, y, r, i, j=0) { 
-    let deg1 = (i / 3)  * 60
-    let deg2 = (i / 3 + 1) * 60
-    xCoord[i+0+j] = x;
-    yCoord[i+0+j] = y;
-    xCoord[i+1+j] = x + r * Math.cos(deg1 * DEG2RAD)
-    yCoord[i+1+j] = y + r * Math.sin(deg1 * DEG2RAD)
-    xCoord[i+2+j] = x + r * Math.cos(deg2  * DEG2RAD)
-    yCoord[i+2+j] = y + r * Math.sin(deg2 * DEG2RAD)
-  }  
-
-
 
   function makeHexagon2(x, y, r, i, j=0) { 
     let deg1 = (i / 3)  * 60
@@ -137,6 +124,7 @@ fn vertMain(
     for (let j = 0; j < 10; j++) {
       for (let i = 0; i < 18; i +=3) {
         makeHexagon2(x + (3/2 * .2) * j, y + vert * k, r, i, 18 * (j + k))
+        makeHexagon2(x + (3/2 * .2) * j + .15, y + vert * k + .1, r, i, 18 * (j + k))
       }
     }
   }
