@@ -58,6 +58,26 @@ fn vertMain(
 }`
   })
 
+  const icoFaces = device.createBuffer({
+    size: 3 * 20 * 2,
+    usage: GPUBufferUsage.INDEX,
+    mappedAtCreation: true
+  })
+  new Uint16Array(icoFaces.getMappedRange()).set([
+    5, 2, 3,  6, 0,  1,  8, 2, 5,  9,  0, 6,
+    9, 6, 7,  9, 2,  8, 10, 1, 4, 10,  4, 5,
+    11, 3, 7, 11, 1, 10,  4, 1, 0,  7,  3, 2,
+    8, 4, 0,  8, 5,  4,  9, 7, 2,  9,  8, 0,
+    10, 5, 3, 11, 6,  1, 11, 7, 6, 11, 10, 3
+  ])
+  icoFaces.unmap()
+  //databind hexagons to color
+  //set color in shader to complaint texture
+
+  //databind textures to hexagons & use shader to change color according to uniform weights
+
+  //use one texture for each complaint type 
+
   const pipeline = device.createRenderPipeline({
     layout: 'auto',
     vertex: {
@@ -158,7 +178,7 @@ fn vertMain(
       colorAttachments: [
         {
           view: context.getCurrentTexture().createView(),
-          clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 1.0 },
+          clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 0.0 },
           loadOp: 'clear',
           storeOp: 'store',
         } as const,
