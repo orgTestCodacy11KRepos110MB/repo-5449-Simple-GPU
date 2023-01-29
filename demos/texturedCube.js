@@ -120,7 +120,8 @@ frag: `
     return output;
   }`,
   attributes: {
-    position: cubeVertexArray
+    position: new webgpu.attribute(
+      cubeVertexArray, 0, 4)
   },
   uniforms: {
     modelViewProjectionMatrix: getTransformationMatrix,
